@@ -151,6 +151,11 @@ macro_rules! generate_vec2 {
                 *self.y_mut() *= inv_l;
             }
 
+            #[inline]
+            pub fn lerp(self, t: $t, end: Self) -> Self {
+                self + t * (end - self)
+            }
+
             // Scalar result operations
             #[inline]
             pub fn dot(self, rhs: Self) -> $t {

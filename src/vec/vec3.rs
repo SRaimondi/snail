@@ -176,6 +176,11 @@ macro_rules! generate_vec3 {
             }
 
             #[inline]
+            pub fn lerp(self, t: $t, end: Self) -> Self {
+                self + t * (end - self)
+            }
+
+            #[inline]
             pub fn cross(self, rhs: Self) -> Self {
                 Self::new(
                     self.y() * rhs.z() - self.z() * rhs.y(),
