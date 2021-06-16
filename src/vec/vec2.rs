@@ -21,7 +21,7 @@ impl Axis2 {
 
 macro_rules! generate_vec2 {
     ($name:ident, $t:ty) => {
-        #[derive(Copy, Clone, Debug, PartialEq)]
+        #[derive(Copy, Clone, Debug, Default, PartialEq)]
         #[repr(C)]
         pub struct $name {
             elements: [$t; 2],
