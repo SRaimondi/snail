@@ -126,6 +126,11 @@ macro_rules! generate_vec2 {
             }
 
             #[inline]
+            pub fn element_wise_recip(self) -> Self {
+                Self::new(self.x().recip(), self.y().recip())
+            }
+
+            #[inline]
             pub fn normalised(self) -> Self {
                 let l = self.length();
                 self / l
