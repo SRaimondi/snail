@@ -75,23 +75,23 @@ macro_rules! generate_vec3 {
             }
 
             #[inline]
-            pub const fn size(self) -> usize {
+            pub const fn len(self) -> usize {
                 3
             }
 
             /// # Safety
-            /// The index should either be 0 or 1, otherwise we get undefined behaviour
+            /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour
             #[inline]
             pub unsafe fn get_unchecked(self, i: usize) -> $t {
-                debug_assert!(i < self.size());
+                debug_assert!(i < self.len());
                 *self.elements.get_unchecked(i)
             }
 
             /// # Safety
-            /// The index should either be 0 or 1, otherwise we get undefined behaviour
+            /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour
             #[inline]
             pub unsafe fn get_unchecked_mut(&mut self, i: usize) -> &mut $t {
-                debug_assert!(i < self.size());
+                debug_assert!(i < self.len());
                 self.elements.get_unchecked_mut(i)
             }
 
