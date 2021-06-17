@@ -83,7 +83,7 @@ macro_rules! generate_vec2 {
 
             #[inline]
             pub fn get(self, i: usize) -> Option<$t> {
-                if i < self.size() {
+                if i < self.len() {
                     Some(unsafe { self.get_unchecked(i) })
                 } else {
                     None
@@ -92,7 +92,7 @@ macro_rules! generate_vec2 {
 
             #[inline]
             pub fn get_mut(&mut self, i: usize) -> Option<&mut $t> {
-                if i < self.size() {
+                if i < self.len() {
                     Some(unsafe { self.get_unchecked_mut(i) })
                 } else {
                     None
