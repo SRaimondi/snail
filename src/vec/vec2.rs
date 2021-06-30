@@ -217,7 +217,7 @@ macro_rules! generate_vec2 {
             // Rotate for the given angle
             #[inline]
             pub fn rotate(self, angle_rad: $t) -> Self {
-                let (c, s) = angle_rad.sin_cos();
+                let (s, c) = angle_rad.sin_cos();
                 Self::new(self.x() * c - self.y() * s, self.x() * s + self.y() * c)
             }
         }
