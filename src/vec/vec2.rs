@@ -167,6 +167,30 @@ macro_rules! generate_vec2 {
                 self + t * (end - self)
             }
 
+            #[inline]
+            pub fn slerp(self, t: $t, end: Self) -> Self {
+                if self == end {
+                    return self;
+                }
+
+                let omega = self.dot(end).acos();
+                let csc = 1.0 / omega.sin();
+
+                let t_omega = t * omega;
+                let sin = t_omega.sin();
+
+                let t_omega_inv = omega - t_omega;
+                let sin_inv = t_omega_inv.sin();
+
+                let a = csc * sin_inv;
+                let b = csc * sin;
+
+                let x = a * self.x() + b * end.x();
+                let y = a * self.y() + b * end.y();
+
+                Self::new(x, y)
+            }
+
             // Scalar result operations
             #[inline]
             pub fn dot(self, rhs: Self) -> $t {
