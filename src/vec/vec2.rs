@@ -39,6 +39,13 @@ macro_rules! generate_vec2 {
             }
 
             #[inline]
+            pub fn from_polar(radius: $t, angle: $t) -> Self {
+                let (s, c) = angle.sin_cos();
+                Self::new(radius * c, radius * s)
+            }
+
+            // Element access
+            #[inline]
             pub const fn x(self) -> $t {
                 self.elements[Axis2::X as usize]
             }
@@ -209,7 +216,7 @@ macro_rules! generate_vec2 {
 
             #[inline]
             pub fn rotate(self, angle_rad: $t) -> Self {
-                let (c, s) = angle_rad.sin_cos();
+                let (s, c) = angle_rad.sin_cos();
                 Self::new(self.x() * c - self.y() * s, self.x() * s + self.y() * c)
             }
         }
