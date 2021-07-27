@@ -30,7 +30,6 @@ macro_rules! generate_vec3 {
         }
 
         impl $name {
-            // Vector construction
             #[inline]
             pub const fn new(x: $t, y: $t, z: $t) -> Self {
                 Self {
@@ -43,7 +42,6 @@ macro_rules! generate_vec3 {
                 Self::new(v, v, v)
             }
 
-            // Element access
             #[inline]
             pub const fn x(self) -> $t {
                 self.elements[Axis3::X as usize]
@@ -113,7 +111,6 @@ macro_rules! generate_vec3 {
                 }
             }
 
-            // Element wise operations
             #[inline]
             pub fn element_wise_min(self, rhs: Self) -> Self {
                 Self::new(
@@ -150,6 +147,15 @@ macro_rules! generate_vec3 {
             #[inline]
             pub fn element_wise_recip(self) -> Self {
                 Self::new(self.x().recip(), self.y().recip(), self.z().recip())
+            }
+
+            #[inline]
+            pub fn element_wise_clamp(self, min: $t, max: $t) -> Self {
+                Self::new(
+                    self.x().clamp(min, max),
+                    self.y().clamp(min, max),
+                    self.z().clamp(min, max),
+                )
             }
 
             #[inline]
@@ -194,7 +200,6 @@ macro_rules! generate_vec3 {
                 )
             }
 
-            // Scalar result operations
             #[inline]
             pub fn dot(self, rhs: Self) -> $t {
                 self.x() * rhs.x() + self.y() * rhs.y() + self.z() * rhs.z()
@@ -220,7 +225,6 @@ macro_rules! generate_vec3 {
                 self.x().max(self.y().max(self.z()))
             }
 
-            // Permute vector elements
             #[inline]
             pub fn permute(self, x_axis: Axis3, y_axis: Axis3, z_axis: Axis3) -> Self {
                 Self::new(self[x_axis], self[y_axis], self[z_axis])
@@ -231,7 +235,6 @@ macro_rules! generate_vec3 {
                 self.permute(axes[0], axes[1], axes[2])
             }
 
-            // Find largest axis in the vector
             #[inline]
             pub fn largest_axis(self) -> Axis3 {
                 if self.x() >= self.y() && self.x() >= self.z() {

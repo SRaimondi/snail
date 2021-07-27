@@ -28,7 +28,6 @@ macro_rules! generate_vec2 {
         }
 
         impl $name {
-            // Vector construction
             #[inline]
             pub const fn new(x: $t, y: $t) -> Self {
                 Self { elements: [x, y] }
@@ -39,7 +38,6 @@ macro_rules! generate_vec2 {
                 Self::new(v, v)
             }
 
-            // Element access
             #[inline]
             pub const fn x(self) -> $t {
                 self.elements[Axis2::X as usize]
@@ -99,7 +97,6 @@ macro_rules! generate_vec2 {
                 }
             }
 
-            // Element wise operations
             #[inline]
             pub fn element_wise_min(self, rhs: Self) -> Self {
                 Self::new(self.x().min(rhs.x()), self.y().min(rhs.y()))
@@ -128,6 +125,11 @@ macro_rules! generate_vec2 {
             #[inline]
             pub fn element_wise_recip(self) -> Self {
                 Self::new(self.x().recip(), self.y().recip())
+            }
+
+            #[inline]
+            pub fn element_wise_clamp(self, min: $t, max: $t) -> Self {
+                Self::new(self.x().clamp(min, max), self.y().clamp(min, max))
             }
 
             #[inline]
@@ -161,7 +163,6 @@ macro_rules! generate_vec2 {
                 self + t * (end - self)
             }
 
-            // Scalar result operations
             #[inline]
             pub fn dot(self, rhs: Self) -> $t {
                 self.x() * rhs.x() + self.y() * rhs.y()
@@ -187,7 +188,6 @@ macro_rules! generate_vec2 {
                 self.x().max(self.y())
             }
 
-            // Permute vector elements
             #[inline]
             pub fn permute(self, x_axis: Axis2, y_axis: Axis2) -> Self {
                 Self::new(self[x_axis], self[y_axis])
@@ -198,7 +198,6 @@ macro_rules! generate_vec2 {
                 self.permute(axes[0], axes[1])
             }
 
-            // Find largest axis in the vector
             #[inline]
             pub fn largest_axis(self) -> Axis2 {
                 if self.x() >= self.y() {
@@ -208,7 +207,6 @@ macro_rules! generate_vec2 {
                 }
             }
 
-            // Rotate for the given angle
             #[inline]
             pub fn rotate(self, angle_rad: $t) -> Self {
                 let (c, s) = angle_rad.sin_cos();
