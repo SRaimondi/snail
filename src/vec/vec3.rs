@@ -1,5 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Deref, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign,
+    Add, AddAssign, Deref, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -307,6 +307,15 @@ macro_rules! generate_vec3 {
                 *self.x_mut() *= rhs;
                 *self.y_mut() *= rhs;
                 *self.z_mut() *= rhs;
+            }
+        }
+
+        impl Neg for $name {
+            type Output = Self;
+
+            #[inline]
+            fn neg(self) -> Self::Output {
+                Self::Output::new(-self.x(), -self.y(), -self.z())
             }
         }
 
