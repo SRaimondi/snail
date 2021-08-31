@@ -188,7 +188,7 @@ macro_rules! generate_vec3 {
 
             #[inline]
             pub fn lerp(self, t: $t, end: Self) -> Self {
-                self + t * (end - self)
+                (1.0 - t) * self + t * end
             }
 
             #[inline]
