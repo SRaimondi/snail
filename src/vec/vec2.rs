@@ -42,7 +42,7 @@ macro_rules! generate_vec2 {
 
             /// Create new vector from the given array.
             #[inline(always)]
-            pub const fn new_from_array(components: [f32; 2]) -> Self {
+            pub const fn new_from_array(components: [$t; 2]) -> Self {
                 Self {
                     elements: components,
                 }
