@@ -46,7 +46,7 @@ macro_rules! generate_vec3 {
 
             /// Create new vector from the given array.
             #[inline(always)]
-            pub const fn new_from_array(components: [$t; 3]) -> Self {
+            pub const fn from_array(components: [$t; 3]) -> Self {
                 Self {
                     elements: components,
                 }
