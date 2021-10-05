@@ -40,6 +40,14 @@ macro_rules! generate_vec2 {
                 Self::new(v, v)
             }
 
+            /// Create new vector from the given array.
+            #[inline(always)]
+            pub const fn new_from_array(components: [f32; 2]) -> Self {
+                Self {
+                    elements: components,
+                }
+            }
+
             /// Create new vector from the given polar representation.
             #[inline(always)]
             pub fn from_polar(radius: $t, angle: $t) -> Self {
