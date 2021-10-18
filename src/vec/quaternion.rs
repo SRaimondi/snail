@@ -73,9 +73,7 @@ macro_rules! generate_quaternion {
                 debug_assert!(float_cmp::approx_eq!($t, v1.norm(), 1.0));
                 debug_assert!(float_cmp::approx_eq!($t, v2.norm(), 1.0));
                 let c = v1.dot(v2);
-                if float_cmp::approx_eq!($t, c, 1.0) {
-                    Self::from_components(1.0, 0.0, 0.0, 0.0)
-                } else if float_cmp::approx_eq!($t, c, -1.0) {
+                if float_cmp::approx_eq!($t, c, -1.0) {
                     Self::new(0.0, v1.compute_perpendicular())
                 } else {
                     let axis = v1.cross(v2);
