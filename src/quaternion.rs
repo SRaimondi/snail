@@ -1,11 +1,11 @@
 use crate::vec3::{Vec3f32, Vec3f64};
 use std::{
     f32, f64,
-    ops::{Add, Div, Sub},
+    ops::{Add, Div, Mul, Sub},
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $vname:ident, $t:ty, $pi:expr) => {
+    ($name:ident, $vname:ident, $t:ty, $pi:expr, $pi_2:expr) => {
         /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
         #[derive(Copy, Clone, Debug, Default, PartialEq)]
         #[repr(C)]
@@ -43,32 +43,6 @@ macro_rules! generate_quaternion {
 
             /// Create quaternion as rotation between two vectors.
             /// Vector are expected to be normalised.
-            /// ```
-            /// use snail::{Quaternionf32, Vec3f32};
-            /// // Rotation between two non parallel vectors
-            /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
-            /// let v1 = Vec3f32::new(0.0, 1.0, 0.0);
-            /// let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
-            /// let v = q.rotate(v0);
-            /// float_cmp::assert_approx_eq!(f32, v.x(), v1.x());
-            /// float_cmp::assert_approx_eq!(f32, v.y(), v1.y());
-            /// float_cmp::assert_approx_eq!(f32, v.z(), v1.z());
-            /// // Rotation between the same vector
-            /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
-            /// let q = Quaternionf32::from_two_vectors_normalised(v0, v0);
-            /// let v = q.rotate(v0);
-            /// float_cmp::assert_approx_eq!(f32, v.x(), v0.x());
-            /// float_cmp::assert_approx_eq!(f32, v.y(), v0.y());
-            /// float_cmp::assert_approx_eq!(f32, v.z(), v0.z());
-            /// // Rotation between opposite vectors
-            /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
-            /// let v1 = Vec3f32::new(-1.0, 0.0, 0.0);
-            /// let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
-            /// let v = q.rotate(v0);
-            /// float_cmp::assert_approx_eq!(f32, v.x(), v1.x());
-            /// float_cmp::assert_approx_eq!(f32, v.y(), v1.y());
-            /// float_cmp::assert_approx_eq!(f32, v.z(), v1.z());
-            /// ```
             #[inline(always)]
             pub fn from_two_vectors_normalised(v1: $vname, v2: $vname) -> Self {
                 debug_assert!(float_cmp::approx_eq!($t, v1.norm(), 1.0));
@@ -124,16 +98,6 @@ macro_rules! generate_quaternion {
             }
 
             /// Apply quaternion as rotation to the given vector.
-            /// ```
-            /// use std::f32::consts::PI;
-            /// use snail::{Quaternionf32, Vec3f32};
-            /// let q = Quaternionf32::from_rotation(PI, Vec3f32::new(0.0, 1.0, 0.0));
-            /// let v = Vec3f32::new(1.0, 0.0, 0.0);
-            /// let v_r = q.rotate(v);
-            /// float_cmp::assert_approx_eq!(f32, v_r.x(), -1.0);
-            /// float_cmp::assert_approx_eq!(f32, v_r.y(), 0.0);
-            /// float_cmp::assert_approx_eq!(f32, v_r.z(), 0.0);
-            /// ```
             #[inline(always)]
             pub fn rotate(self, v: $vname) -> $vname {
                 debug_assert!(float_cmp::approx_eq!($t, self.norm(), 1.0));
@@ -161,9 +125,36 @@ macro_rules! generate_quaternion {
             }
 
             /// Extract Euler angles from the quaternion in x, y, z order, assumed to be rotated
-            /// in the order X Y Z.
-            pub fn extract_euler_xyz(self) -> ($t, $t, $t) {
-                todo!()
+            /// in first on z, then on y and last on x.
+            /// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
+            pub fn extract_euler(self) -> ($t, $t, $t) {
+                debug_assert!(float_cmp::approx_eq!($t, self.norm(), 1.0));
+                // Check for singularity
+                let s_test = self.scalar * self.complex.y() + self.complex.z() * self.complex.x();
+                if float_cmp::approx_eq!($t, s_test.abs(), 0.5) {
+                    (
+                        self.complex.z().atan2(self.scalar),
+                        $pi_2.copysign(s_test),
+                        0.0,
+                    )
+                } else {
+                    let theta_z = (2.0
+                        * (self.scalar * self.complex.z() - self.complex.y() * self.complex.x()))
+                    .atan2(
+                        1.0 - 2.0
+                            * (self.complex.z() * self.complex.z()
+                                + self.complex.y() * self.complex.y()),
+                    );
+                    let theta_y = (2.0 * s_test).asin();
+                    let theta_x = (2.0
+                        * (self.scalar * self.complex.x() - self.complex.z() * self.complex.y()))
+                    .atan2(
+                        1.0 - 2.0
+                            * (self.complex.y() * self.complex.y()
+                                + self.complex.x() * self.complex.x()),
+                    );
+                    (theta_z, theta_y, theta_x)
+                }
             }
         }
 
@@ -193,8 +184,34 @@ macro_rules! generate_quaternion {
                 Self::Output::new(self.scalar / rhs, self.complex / rhs)
             }
         }
+
+        impl Mul for $name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn mul(self, rhs: Self) -> Self::Output {
+                Self::Output::new(
+                    self.scalar * rhs.scalar - self.complex.dot(rhs.complex),
+                    self.scalar * rhs.complex
+                        + rhs.scalar * self.complex
+                        + self.complex.cross(rhs.complex),
+                )
+            }
+        }
     };
 }
 
-generate_quaternion!(Quaternionf32, Vec3f32, f32, f32::consts::PI);
-generate_quaternion!(Quaternionf64, Vec3f64, f64, f64::consts::PI);
+generate_quaternion!(
+    Quaternionf32,
+    Vec3f32,
+    f32,
+    f32::consts::PI,
+    f32::consts::FRAC_PI_2
+);
+generate_quaternion!(
+    Quaternionf64,
+    Vec3f64,
+    f64,
+    f64::consts::PI,
+    f64::consts::FRAC_PI_2
+);
