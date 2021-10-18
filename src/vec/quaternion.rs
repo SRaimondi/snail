@@ -41,7 +41,8 @@ macro_rules! generate_quaternion {
                 Self::new(0.0, v)
             }
 
-            /// Create quaternion as rotation between two vectors. Vector are expected to be normalised.
+            /// Create quaternion as rotation between two vectors.
+            /// Vector are expected to be normalised.
             /// ```
             /// use snail::{Quaternionf32, Vec3f32};
             /// // Rotation between two non parallel vectors
@@ -83,6 +84,8 @@ macro_rules! generate_quaternion {
                 }
             }
 
+            /// Create quaternion as rotation between two vectors.
+            /// Vector are not expected to be normalised.
             #[inline(always)]
             pub fn from_two_vectors(v1: $vname, v2: $vname) -> Self {
                 Self::from_two_vectors_normalised(v1.normalised(), v2.normalised())
