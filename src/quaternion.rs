@@ -125,7 +125,7 @@ macro_rules! generate_quaternion {
             }
 
             /// Extract Euler angles from the quaternion in x, y, z order, assumed to be rotated
-            /// in first on z, then on y and last on x.
+            /// first on z, then on y and last on x.
             /// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
             pub fn extract_euler(self) -> ($t, $t, $t) {
                 debug_assert!(float_cmp::approx_eq!($t, self.norm(), 1.0));
