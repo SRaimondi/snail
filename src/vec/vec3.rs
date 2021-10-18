@@ -191,21 +191,21 @@ macro_rules! generate_vec3 {
             /// Return a new normalised vector.
             #[inline(always)]
             pub fn normalised(self) -> Self {
-                let l = self.length();
+                let l = self.norm();
                 self / l
             }
 
             /// Return a new normalised vector, uses multiplication instead of division on the components.
             #[inline(always)]
             pub fn normalised_fast(self) -> Self {
-                let inv_l = 1.0 / self.length();
+                let inv_l = 1.0 / self.norm();
                 inv_l * self
             }
 
             /// Normalise vector in place.
             #[inline(always)]
             pub fn normalise(&mut self) {
-                let l = self.length();
+                let l = self.norm();
                 *self.x_mut() /= l;
                 *self.y_mut() /= l;
                 *self.z_mut() /= l;
@@ -214,7 +214,7 @@ macro_rules! generate_vec3 {
             /// Normalise vector in place using multiplication.
             #[inline(always)]
             pub fn normalise_fast(&mut self) {
-                let inv_l = 1.0 / self.length();
+                let inv_l = 1.0 / self.norm();
                 *self.x_mut() *= inv_l;
                 *self.y_mut() *= inv_l;
                 *self.z_mut() *= inv_l;
@@ -244,14 +244,14 @@ macro_rules! generate_vec3 {
 
             /// Compute squared length of the vector.
             #[inline(always)]
-            pub fn length_squared(self) -> $t {
+            pub fn norm_squared(self) -> $t {
                 self.dot(self)
             }
 
             /// Compute length of the vector.
             #[inline(always)]
-            pub fn length(self) -> $t {
-                self.length_squared().sqrt()
+            pub fn norm(self) -> $t {
+                self.norm_squared().sqrt()
             }
 
             /// Compute minimum element.
