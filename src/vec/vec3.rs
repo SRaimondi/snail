@@ -289,6 +289,24 @@ macro_rules! generate_vec3 {
                     Axis3::Z
                 }
             }
+
+            /// Compute perpendicular vector.
+            /// ```
+            /// let v = snail::Vec3f32::new(1.5, 2.5, 4.5);
+            /// let vp = v.compute_perpendicular();
+            /// let d = v.dot(vp);
+            /// float_cmp::assert_approx_eq!(f32, d, 0.0);
+            /// ```
+            #[inline(always)]
+            pub fn compute_perpendicular(self) -> Self {
+                if self.x().abs() > self.y().abs() {
+                    let n = (self.x() * self.x() + self.z() * self.z()).sqrt();
+                    Self::new(-self.z() / n, 0.0, self.x() / n)
+                } else {
+                    let n = (self.y() * self.y() + self.z() * self.z()).sqrt();
+                    Self::new(0.0, self.z() / n, -self.y() / n)
+                }
+            }
         }
 
         impl Add for $name {

@@ -1,8 +1,11 @@
 use crate::vec3::{Vec3f32, Vec3f64};
-use std::{f32, f64};
+use std::{
+    f32, f64,
+    ops::{Add, Div, Sub},
+};
 
 macro_rules! generate_quaternion {
-    ($name:ident, $vname:ident, $t:ty, $pi_2:expr) => {
+    ($name:ident, $vname:ident, $t:ty, $pi:expr) => {
         /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
         #[derive(Copy, Clone, Debug, Default, PartialEq)]
         #[repr(C)]
@@ -41,8 +44,24 @@ macro_rules! generate_quaternion {
             /// Create quaternion as rotation between two vectors. Vector are expected to be normalised.
             /// ```
             /// use snail::{Quaternionf32, Vec3f32};
+            /// // Rotation between two non parallel vectors
             /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
             /// let v1 = Vec3f32::new(0.0, 1.0, 0.0);
+            /// let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
+            /// let v = q.rotate(v0);
+            /// float_cmp::assert_approx_eq!(f32, v.x(), v1.x());
+            /// float_cmp::assert_approx_eq!(f32, v.y(), v1.y());
+            /// float_cmp::assert_approx_eq!(f32, v.z(), v1.z());
+            /// // Rotation between the same vector
+            /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
+            /// let q = Quaternionf32::from_two_vectors_normalised(v0, v0);
+            /// let v = q.rotate(v0);
+            /// float_cmp::assert_approx_eq!(f32, v.x(), v0.x());
+            /// float_cmp::assert_approx_eq!(f32, v.y(), v0.y());
+            /// float_cmp::assert_approx_eq!(f32, v.z(), v0.z());
+            /// // Rotation between opposite vectors
+            /// let v0 = Vec3f32::new(1.0, 0.0, 0.0);
+            /// let v1 = Vec3f32::new(-1.0, 0.0, 0.0);
             /// let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
             /// let v = q.rotate(v0);
             /// float_cmp::assert_approx_eq!(f32, v.x(), v1.x());
@@ -54,10 +73,16 @@ macro_rules! generate_quaternion {
                 debug_assert!(float_cmp::approx_eq!($t, v1.norm(), 1.0));
                 debug_assert!(float_cmp::approx_eq!($t, v2.norm(), 1.0));
                 let c = v1.dot(v2);
-                let axis = v1.cross(v2);
-                let s = (2.0 * (1.0 + c)).sqrt();
-                let inv_s = 1.0 / s;
-                Self::new(0.5 * s, inv_s * axis)
+                if float_cmp::approx_eq!($t, c, 1.0) {
+                    Self::from_components(1.0, 0.0, 0.0, 0.0)
+                } else if float_cmp::approx_eq!($t, c, -1.0) {
+                    Self::new(0.0, v1.compute_perpendicular())
+                } else {
+                    let axis = v1.cross(v2);
+                    let s = (2.0 * (1.0 + c)).sqrt();
+                    let inv_s = 1.0 / s;
+                    Self::new(0.5 * s, inv_s * axis)
+                }
             }
 
             #[inline(always)]
@@ -141,7 +166,25 @@ macro_rules! generate_quaternion {
             }
         }
 
-        impl std::ops::Div<$t> for $name {
+        impl Add for $name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn add(self, rhs: Self) -> Self::Output {
+                Self::Output::new(self.scalar + rhs.scalar, self.complex + rhs.complex)
+            }
+        }
+
+        impl Sub for $name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn sub(self, rhs: Self) -> Self::Output {
+                Self::Output::new(self.scalar - rhs.scalar, self.complex - rhs.complex)
+            }
+        }
+
+        impl Div<$t> for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -152,5 +195,5 @@ macro_rules! generate_quaternion {
     };
 }
 
-generate_quaternion!(Quaternionf32, Vec3f32, f32, f32::consts::FRAC_PI_2);
-generate_quaternion!(Quaternionf64, Vec3f64, f64, f64::consts::FRAC_PI_2);
+generate_quaternion!(Quaternionf32, Vec3f32, f32, f32::consts::PI);
+generate_quaternion!(Quaternionf64, Vec3f64, f64, f64::consts::PI);
