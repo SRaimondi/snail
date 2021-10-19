@@ -155,7 +155,7 @@ macro_rules! generate_complex {
             type Output = Self;
 
             #[inline(always)]
-            fn mul(self, rhs: f32) -> Self::Output {
+            fn mul(self, rhs: $t) -> Self::Output {
                 Self::Output::new(self.real * rhs, self.im * rhs)
             }
         }
