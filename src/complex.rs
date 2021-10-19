@@ -93,7 +93,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Add for Complex {
+        impl Add for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -102,7 +102,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl AddAssign for Complex {
+        impl AddAssign for $name {
             #[inline(always)]
             fn add_assign(&mut self, rhs: Self) {
                 self.real += rhs.real;
@@ -110,7 +110,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Div for Complex {
+        impl Div for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -122,7 +122,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Div<$t> for Complex {
+        impl Div<$t> for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -131,7 +131,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl DivAssign<$t> for Complex {
+        impl DivAssign<$t> for $name {
             #[inline(always)]
             fn div_assign(&mut self, rhs: $t) {
                 self.real /= rhs;
@@ -139,7 +139,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Mul for Complex {
+        impl Mul for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -151,7 +151,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Mul<$t> for Complex {
+        impl Mul<$t> for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -161,15 +161,15 @@ macro_rules! generate_complex {
         }
 
         impl Mul<Complex> for $t {
-            type Output = Complex;
+            type Output = $name;
 
             #[inline(always)]
-            fn mul(self, rhs: Complex) -> Self::Output {
+            fn mul(self, rhs: $name) -> Self::Output {
                 Self::Output::new(self * rhs.real, self * rhs.im)
             }
         }
 
-        impl Neg for Complex {
+        impl Neg for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -178,7 +178,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Sub for Complex {
+        impl Sub for $name {
             type Output = Self;
 
             #[inline(always)]
@@ -187,7 +187,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl SubAssign for Complex {
+        impl SubAssign for $name {
             #[inline(always)]
             fn sub_assign(&mut self, rhs: Self) {
                 self.real -= rhs.real;
