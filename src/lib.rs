@@ -1,6 +1,8 @@
+pub use complex::*;
 pub use quaternion::*;
 pub use vec::*;
 
+pub mod complex;
 pub mod quaternion;
 pub mod vec;
 
