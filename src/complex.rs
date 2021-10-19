@@ -160,7 +160,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Mul<Complex> for $t {
+        impl Mul<$name> for $t {
             type Output = $name;
 
             #[inline(always)]
