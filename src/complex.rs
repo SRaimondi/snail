@@ -33,13 +33,13 @@ macro_rules! generate_complex {
             }
 
             /// Compute squared norm.
-            #[inline(alwawys)]
+            #[inline(always)]
             pub fn norm_squared(self) -> $t {
                 self.real * self.real + self.im * self.im
             }
 
             /// Compute norm.
-            #[inline(alwawys)]
+            #[inline(always)]
             pub fn norm(self) -> $t {
                 self.norm_squared().sqrt()
             }
