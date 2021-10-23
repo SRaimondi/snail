@@ -73,6 +73,24 @@ macro_rules! generate_quaternion {
                 Self::new(c, s * axis)
             }
 
+            /// Create rotation around the x axis for the given angle.
+            #[inline(always)]
+            pub fn x_rotation(angle: $t) -> Self {
+                Self::from_rotation(angle, $vname::new(1.0, 0.0, 0.0))
+            }
+
+            /// Create rotation around the y axis for the given angle.
+            #[inline(always)]
+            pub fn y_rotation(angle: $t) -> Self {
+                Self::from_rotation(angle, $vname::new(0.0, 1.0, 0.0))
+            }
+
+            /// Create rotation around the z axis for the given angle.
+            #[inline(always)]
+            pub fn z_rotation(angle: $t) -> Self {
+                Self::from_rotation(angle, $vname::new(0.0, 0.0, 1.0))
+            }
+
             /// Compute squared norm of the quaternion.
             #[inline(always)]
             pub fn norm_squared(self) -> $t {
