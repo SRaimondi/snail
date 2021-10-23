@@ -123,39 +123,6 @@ macro_rules! generate_quaternion {
                         + v.z() * (1.0 - 2.0 * (qx_2 + qy_2)),
                 )
             }
-
-            /// Extract Euler angles from the quaternion in x, y, z order, assumed to be rotated
-            /// first on z, then on y and last on x.
-            /// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
-            pub fn extract_euler(self) -> ($t, $t, $t) {
-                debug_assert!(float_cmp::approx_eq!($t, self.norm(), 1.0));
-                // Check for singularity
-                let s_test = self.scalar * self.complex.y() + self.complex.z() * self.complex.x();
-                if float_cmp::approx_eq!($t, s_test.abs(), 0.5) {
-                    (
-                        self.complex.z().atan2(self.scalar),
-                        $pi_2.copysign(s_test),
-                        0.0,
-                    )
-                } else {
-                    let theta_z = (2.0
-                        * (self.scalar * self.complex.z() - self.complex.y() * self.complex.x()))
-                    .atan2(
-                        1.0 - 2.0
-                            * (self.complex.z() * self.complex.z()
-                                + self.complex.y() * self.complex.y()),
-                    );
-                    let theta_y = (2.0 * s_test).asin();
-                    let theta_x = (2.0
-                        * (self.scalar * self.complex.x() - self.complex.z() * self.complex.y()))
-                    .atan2(
-                        1.0 - 2.0
-                            * (self.complex.y() * self.complex.y()
-                                + self.complex.x() * self.complex.x()),
-                    );
-                    (theta_z, theta_y, theta_x)
-                }
-            }
         }
 
         impl Add for $name {

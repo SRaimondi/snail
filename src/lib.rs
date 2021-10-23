@@ -47,26 +47,4 @@ mod tests {
         float_cmp::assert_approx_eq!(f32, v_r.y(), 0.0);
         float_cmp::assert_approx_eq!(f32, v_r.z(), 0.0);
     }
-
-    #[test]
-    fn test_euler() {
-        use std::f32::consts::FRAC_PI_4;
-        let q = Quaternionf32::from_rotation(FRAC_PI_4, Vec3f32::new(1.2, -4.5, 8.0).normalised());
-        // Rotate using quaternion
-        let v = Vec3f32::new(10.0, 15.0, -4.0);
-        let v_rotated = q.rotate(v);
-        // Try to extract euler angles
-        let angles = q.extract_euler();
-        // Rotate v in order using the Euler angles
-        let v_rot_z = Quaternionf32::from_rotation(angles.0, Vec3f32::new(0.0, 0.0, 1.0)).rotate(v);
-        let v_rot_y =
-            Quaternionf32::from_rotation(angles.1, Vec3f32::new(0.0, 1.0, 0.0)).rotate(v_rot_z);
-        let v_rot_x =
-            Quaternionf32::from_rotation(angles.2, Vec3f32::new(1.0, 0.0, 0.0)).rotate(v_rot_y);
-        // Because of the operations, it's hard to get exactly the same values, we use a larger
-        // tolerance compared to the default one
-        float_cmp::assert_approx_eq!(f32, v_rotated.x(), v_rot_x.x(), epsilon = 0.00001);
-        float_cmp::assert_approx_eq!(f32, v_rotated.y(), v_rot_x.y(), epsilon = 0.00001);
-        float_cmp::assert_approx_eq!(f32, v_rotated.z(), v_rot_x.z(), epsilon = 0.00001);
-    }
 }
