@@ -373,6 +373,13 @@ macro_rules! generate_vec2 {
                 &mut self.elements[index as usize]
             }
         }
+
+        impl std::convert::Into<($t, $t)> for $name {
+            #[inline(always)]
+            fn into(self) -> ($t, $t) {
+                (self.x(), self.y())
+            }
+        }
     };
 }
 
