@@ -28,6 +28,11 @@ macro_rules! generate_vec2 {
         }
 
         impl $name {
+            /// Associated constant representing the x axis.
+            pub const EX: Self = Self::new(1.0, 0.0);
+            /// Associated constant representing the y axis.
+            pub const EY: Self = Self::new(0.0, 1.0);
+
             /// Create new vector from the given coordinates.
             #[inline(always)]
             pub const fn new(x: $t, y: $t) -> Self {
