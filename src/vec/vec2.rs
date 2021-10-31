@@ -385,6 +385,13 @@ macro_rules! generate_vec2 {
                 (self.x(), self.y())
             }
         }
+
+        impl std::convert::Into<[$t; 2]> for $name {
+            #[inline(always)]
+            fn into(self) -> [$t; 2] {
+                self.elements
+            }
+        }
     };
 }
 

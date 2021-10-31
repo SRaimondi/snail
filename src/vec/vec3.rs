@@ -431,6 +431,13 @@ macro_rules! generate_vec3 {
                 (self.x(), self.y(), self.z())
             }
         }
+
+        impl std::convert::Into<[$t; 3]> for $name {
+            #[inline(always)]
+            fn into(self) -> [$t; 3] {
+                self.elements
+            }
+        }
     };
 }
 
