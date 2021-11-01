@@ -118,7 +118,6 @@ macro_rules! generate_quaternion {
             /// Apply quaternion as rotation to the given vector.
             #[inline(always)]
             pub fn rotate(self, v: $vname) -> $vname {
-                debug_assert!(float_cmp::approx_eq!($t, self.norm(), 1.0));
                 // Naming
                 let qw = self.scalar;
                 let qx = self.complex.x();
