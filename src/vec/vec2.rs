@@ -10,7 +10,7 @@ pub enum Axis2 {
 }
 
 impl Axis2 {
-    #[inline]
+    #[inline(always)]
     pub const fn next(self) -> Self {
         match self {
             Self::X => Self::Y,

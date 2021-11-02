@@ -11,7 +11,7 @@ pub enum Axis3 {
 }
 
 impl Axis3 {
-    #[inline]
+    #[inline(always)]
     pub const fn next(self) -> Self {
         match self {
             Self::X => Self::Y,
@@ -57,6 +57,17 @@ macro_rules! generate_vec3 {
                 Self {
                     elements: components,
                 }
+            }
+
+            /// Create new vector from the given polar representation.
+            /// phi is the angle with respect to the x axis and theta is
+            /// the angle with respect to the y axis.
+            #[inline(always)]
+            pub fn from_polar(radius: $t, phi: $t, theta: $t) -> Self {
+                let (s_theta, c_theta) = theta.sin_cos();
+                let r_xz = s_theta * radius;
+                let (s_phi, c_phi) = phi.sin_cos();
+                Self::new(r_xz * c_phi, radius * c_theta, r_xz * s_phi)
             }
 
             /// Access x components by value.
