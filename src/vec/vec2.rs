@@ -376,17 +376,17 @@ macro_rules! generate_vec2 {
             }
         }
 
-        impl std::convert::Into<($t, $t)> for $name {
+        impl std::convert::From<($t, $t)> for $name {
             #[inline(always)]
-            fn into(self) -> ($t, $t) {
-                (self.x(), self.y())
+            fn from(v: ($t, $t)) -> Self {
+                Self::new(v.0, v.1)
             }
         }
 
-        impl std::convert::Into<[$t; 2]> for $name {
+        impl std::convert::From<[$t; 2]> for $name {
             #[inline(always)]
-            fn into(self) -> [$t; 2] {
-                self.elements
+            fn from(v: [$t; 2]) -> Self {
+                Self { elements: v }
             }
         }
     };

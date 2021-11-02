@@ -1,17 +1,23 @@
-use crate::vec3::{Vec3f32, Vec3f64};
+use crate::{Axis3, Vec3f32, Vec3f64};
 use std::{
     f32, f64,
     ops::{Add, Div, Mul, Sub},
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $vname:ident, $t:ty, $pi:expr, $pi_2:expr, $eps:expr) => {
+    ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr, $eps:expr) => {
         /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
         #[derive(Copy, Clone, Debug, Default, PartialEq)]
         #[repr(C)]
         pub struct $name {
             pub scalar: $t,
             pub complex: $vname,
+        }
+
+        #[derive(Copy, Clone)]
+        pub enum $euler_name {
+            Normal($t, $t, $t),
+            Singularity($t, $t),
         }
 
         impl $name {
@@ -103,6 +109,14 @@ macro_rules! generate_quaternion {
                 self.norm_squared().sqrt()
             }
 
+            /// Compute normalised quaternion.
+            #[inline(always)]
+            pub fn normalised(self) -> Self {
+                let n = self.norm();
+                assert!(n > 0.0);
+                Self::new(self.scalar / n, self.complex / n)
+            }
+
             /// Compute conjugate quaternion.
             #[inline(always)]
             pub fn conjugate(self) -> Self {
@@ -139,6 +153,29 @@ macro_rules! generate_quaternion {
                         + 2.0 * v.y() * (qy * qz + qw * qx)
                         + v.z() * (1.0 - 2.0 * (qx_2 + qy_2)),
                 )
+            }
+
+            /// Extract the Euler angles for the given order from the quaternion.
+            /// The output order is the same as the given one.
+            /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
+            pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
+                // Naming
+                let p0 = self.scalar;
+                let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
+                // Compute e for sign swap
+                let e = if order.is_e_positive() { 1.0 } else { -1.0 };
+
+                // Test if we are at a singularity
+                let s_test = p0 * p2 + e * p1 * p3;
+                if float_cmp::approx_eq!($t, s_test.abs(), 0.5) {
+                    $euler_name::Singularity(2.0 * p1.atan2(p0), $pi_2.copysign(s_test))
+                } else {
+                    $euler_name::Normal(
+                        (2.0 * (p0 * p1 - e * p2 * p3)).atan2(1.0 - 2.0 * (p1 * p1 + p2 * p2)),
+                        (2.0 * s_test).asin(),
+                        (2.0 * (p0 * p3 - e * p1 * p2)).atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
+                    )
+                }
             }
         }
 
@@ -185,26 +222,49 @@ macro_rules! generate_quaternion {
     };
 }
 
+#[derive(Copy, Clone)]
+pub enum EulerOrder {
+    XYZ,
+    YZX,
+    ZXY,
+    ZYX,
+    XZY,
+    YXZ,
+}
+
+impl EulerOrder {
+    fn is_e_positive(self) -> bool {
+        match self {
+            Self::XYZ | Self::YZX | Self::ZXY => false,
+            Self::ZYX | Self::XZY | Self::YXZ => true,
+        }
+    }
+
+    fn permutation(self) -> [Axis3; 3] {
+        match self {
+            Self::XYZ => [Axis3::X, Axis3::Y, Axis3::Z],
+            Self::YZX => [Axis3::Y, Axis3::Z, Axis3::X],
+            Self::ZXY => [Axis3::Z, Axis3::X, Axis3::Y],
+            Self::ZYX => [Axis3::Z, Axis3::Y, Axis3::X],
+            Self::XZY => [Axis3::X, Axis3::Z, Axis3::Y],
+            Self::YXZ => [Axis3::Y, Axis3::X, Axis3::Z],
+        }
+    }
+}
+
 generate_quaternion!(
     Quaternionf32,
+    EulerDecompositionf32,
     Vec3f32,
     f32,
-    f32::consts::PI,
     f32::consts::FRAC_PI_2,
     100.0 * f32::EPSILON
 );
 generate_quaternion!(
     Quaternionf64,
+    EulerDecompositionf64,
     Vec3f64,
     f64,
-    f64::consts::PI,
     f64::consts::FRAC_PI_2,
     100.0 * f64::EPSILON
 );
-
-// TODO Add more
-pub enum EulerOrder {
-    ZYX,
-}
-
-impl Quaternionf32 {}
