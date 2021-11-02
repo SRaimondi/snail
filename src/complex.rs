@@ -23,7 +23,7 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn from_polar(radius: $t, angle: $t) -> Self {
                 let (s, c) = angle.sin_cos();
-                Self::new(c * radius, s * radius)
+                Self::new(radius * c, radius * s)
             }
 
             /// Create complex number with radius 1 and for the given angle.
@@ -65,7 +65,7 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn recip(self) -> Self {
                 let n2 = self.norm_squared();
-                assert!(!float_cmp::approx_eq!($t, n2, 0.0));
+                assert!(n2 > 0.0);
                 Self::new(self.real / n2, -self.im / n2)
             }
 
@@ -116,6 +116,7 @@ macro_rules! generate_complex {
             #[inline(always)]
             fn div(self, rhs: Self) -> Self::Output {
                 let n2 = rhs.norm_squared();
+                assert!(n2 > 0.0);
                 let r = (self.real * rhs.real + self.im * rhs.im);
                 let im = (self.im * rhs.real - self.real * rhs.im);
                 Self::Output::new(r / n2, im / n2)

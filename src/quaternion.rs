@@ -5,7 +5,7 @@ use std::{
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $vname:ident, $t:ty, $pi:expr, $pi_2:expr) => {
+    ($name:ident, $vname:ident, $t:ty, $pi:expr, $pi_2:expr, $eps:expr) => {
         /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
         #[derive(Copy, Clone, Debug, Default, PartialEq)]
         #[repr(C)]
@@ -45,10 +45,10 @@ macro_rules! generate_quaternion {
             /// Vector are expected to be normalised.
             #[inline(always)]
             pub fn from_two_vectors_normalised(v1: $vname, v2: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, v1.norm(), 1.0));
-                debug_assert!(float_cmp::approx_eq!($t, v2.norm(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, v1.norm_squared(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, v2.norm_squared(), 1.0));
                 let c = v1.dot(v2);
-                if float_cmp::approx_eq!($t, c, -1.0) {
+                if c < -1.0 + $eps {
                     Self::new(0.0, v1.compute_perpendicular())
                 } else {
                     let axis = v1.cross(v2);
@@ -68,7 +68,7 @@ macro_rules! generate_quaternion {
             /// Create rotation versor. Assumes axis has unit length.
             #[inline(always)]
             pub fn from_rotation(angle: $t, axis: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, axis.norm(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, axis.norm_squared(), 1.0));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
             }
@@ -190,12 +190,21 @@ generate_quaternion!(
     Vec3f32,
     f32,
     f32::consts::PI,
-    f32::consts::FRAC_PI_2
+    f32::consts::FRAC_PI_2,
+    100.0 * f32::EPSILON
 );
 generate_quaternion!(
     Quaternionf64,
     Vec3f64,
     f64,
     f64::consts::PI,
-    f64::consts::FRAC_PI_2
+    f64::consts::FRAC_PI_2,
+    100.0 * f64::EPSILON
 );
+
+// TODO Add more
+pub enum EulerOrder {
+    ZYX,
+}
+
+impl Quaternionf32 {}

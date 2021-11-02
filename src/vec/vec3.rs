@@ -1,5 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Deref, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
+    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -104,6 +104,12 @@ macro_rules! generate_vec3 {
             #[inline(always)]
             pub fn z_mut(&mut self) -> &mut $t {
                 &mut self.elements[Axis3::Z as usize]
+            }
+
+            /// Iterate over the elements by value.
+            #[inline(always)]
+            pub fn iter(self) -> std::array::IntoIter<$t, 3> {
+                self.elements.into_iter()
             }
 
             /// Number of elements in the vector.
@@ -408,15 +414,6 @@ macro_rules! generate_vec3 {
                 *self.x_mut() /= rhs;
                 *self.y_mut() /= rhs;
                 *self.z_mut() /= rhs;
-            }
-        }
-
-        impl Deref for $name {
-            type Target = [$t];
-
-            #[inline(always)]
-            fn deref(&self) -> &Self::Target {
-                &self.elements
             }
         }
 
