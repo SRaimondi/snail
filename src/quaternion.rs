@@ -117,6 +117,12 @@ macro_rules! generate_quaternion {
                 Self::new(self.scalar / n, self.complex / n)
             }
 
+            /// Compute dot product with another quaternion.
+            #[inline(always)]
+            pub fn dot(self, other: Self) -> $t {
+                self.scalar * other.scalar + self.complex.dot(other.complex)
+            }
+
             /// Compute conjugate quaternion.
             #[inline(always)]
             pub fn conjugate(self) -> Self {
