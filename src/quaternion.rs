@@ -164,6 +164,7 @@ macro_rules! generate_quaternion {
             /// Extract the Euler angles for the given order from the quaternion.
             /// The output order is the same as the given one.
             /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
+            #[inline]
             pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
                 // Naming
                 let p0 = self.scalar;
