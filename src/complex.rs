@@ -79,7 +79,7 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn normalise(&mut self) {
                 let n = self.norm();
-                assert!(n > 0.0);
+                debug_assert!(n > 0.0);
                 self.real /= n;
                 self.im /= n;
             }
@@ -88,7 +88,7 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn normalised(self) -> Self {
                 let n = self.norm();
-                assert!(n > 0.0);
+                debug_assert!(n > 0.0);
                 Self::new(self.real / n, self.im / n)
             }
         }

@@ -123,7 +123,7 @@ macro_rules! generate_quaternion {
             #[inline(always)]
             pub fn normalised(self) -> Self {
                 let n = self.norm();
-                assert!(n > 0.0);
+                debug_assert!(n > 0.0);
                 Self::new(self.scalar / n, self.complex / n)
             }
 

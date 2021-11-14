@@ -215,33 +215,39 @@ macro_rules! generate_vec3 {
             /// Return a new normalised vector.
             #[inline(always)]
             pub fn normalised(self) -> Self {
-                let l = self.norm();
-                self / l
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                self / n
             }
 
             /// Return a new normalised vector, uses multiplication instead of division on the components.
             #[inline(always)]
             pub fn normalised_fast(self) -> Self {
-                let inv_l = 1.0 / self.norm();
-                inv_l * self
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                let inv_n = 1.0 / n;
+                inv_n * self
             }
 
             /// Normalise vector in place.
             #[inline(always)]
             pub fn normalise(&mut self) {
-                let l = self.norm();
-                *self.x_mut() /= l;
-                *self.y_mut() /= l;
-                *self.z_mut() /= l;
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                *self.x_mut() /= n;
+                *self.y_mut() /= n;
+                *self.z_mut() /= n;
             }
 
             /// Normalise vector in place using multiplication.
             #[inline(always)]
             pub fn normalise_fast(&mut self) {
-                let inv_l = 1.0 / self.norm();
-                *self.x_mut() *= inv_l;
-                *self.y_mut() *= inv_l;
-                *self.z_mut() *= inv_l;
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                let inv_n = 1.0 / n;
+                *self.x_mut() *= inv_n;
+                *self.y_mut() *= inv_n;
+                *self.z_mut() *= inv_n;
             }
 
             /// Linearly interpolate for each component.
