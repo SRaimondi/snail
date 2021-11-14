@@ -20,6 +20,16 @@ macro_rules! generate_quaternion {
             Singularity($t, $t),
         }
 
+        impl std::convert::Into<($t, $t, $t)> for $euler_name {
+            #[inline(always)]
+            fn into(self) -> ($t, $t, $t) {
+                match self {
+                    Self::Normal(t0, t1, t2) => (t0, t1, t2),
+                    Self::Singularity(t0, t1) => (t0, t1, 0.0),
+                }
+            }
+        }
+
         impl $name {
             /// Create new quaternion from the given components.
             #[inline(always)]
