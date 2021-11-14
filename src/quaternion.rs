@@ -174,7 +174,7 @@ macro_rules! generate_quaternion {
 
                 // Test if we are at a singularity
                 let s_test = p0 * p2 + e * p1 * p3;
-                if float_cmp::approx_eq!($t, s_test.abs(), 0.5) {
+                if s_test.abs() > 0.5 - $eps {
                     $euler_name::Singularity(2.0 * p1.atan2(p0), $pi_2.copysign(s_test))
                 } else {
                     $euler_name::Normal(
@@ -240,6 +240,7 @@ pub enum EulerOrder {
 }
 
 impl EulerOrder {
+    #[inline(always)]
     fn is_e_positive(self) -> bool {
         match self {
             Self::XYZ | Self::YZX | Self::ZXY => false,
@@ -247,6 +248,7 @@ impl EulerOrder {
         }
     }
 
+    #[inline(always)]
     fn permutation(self) -> [Axis3; 3] {
         match self {
             Self::XYZ => [Axis3::X, Axis3::Y, Axis3::Z],
@@ -265,7 +267,7 @@ generate_quaternion!(
     Vec3f32,
     f32,
     f32::consts::FRAC_PI_2,
-    100.0 * f32::EPSILON
+    1e-5
 );
 generate_quaternion!(
     Quaternionf64,
@@ -273,5 +275,5 @@ generate_quaternion!(
     Vec3f64,
     f64,
     f64::consts::FRAC_PI_2,
-    100.0 * f64::EPSILON
+    1e-12
 );

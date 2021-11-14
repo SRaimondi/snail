@@ -157,6 +157,11 @@ mod tests {
             Vec3f32::new(r * c, y, r * s)
         };
 
+        let compare_dot = |dot: f32| {
+            // The precision here is arbitrary, we want to make sure the two final vectors are close enough
+            assert!((dot - 1.0).abs() <= 0.00005);
+        };
+
         // XYZ order
         for _ in 0..TESTS {
             let (x_angle, y_angle, z_angle) = generate_angles(&mut pcg32);
@@ -181,7 +186,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
 
         // YZX order
@@ -208,7 +213,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
 
         // ZXY order
@@ -235,7 +240,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
 
         // ZYX order
@@ -262,7 +267,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
 
         // XZY order
@@ -289,7 +294,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
 
         // YXZ order
@@ -316,7 +321,7 @@ mod tests {
                 .rotate(v),
             };
 
-            float_cmp::assert_approx_eq!(f32, r_euler.dot(r), 1.0, epsilon = 0.00001);
+            compare_dot(r_euler.dot(r));
         }
     }
 }
