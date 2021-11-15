@@ -57,14 +57,14 @@ macro_rules! generate_quaternion {
             /// Create quaternion as rotation between two vectors.
             /// Vector are expected to be normalised.
             #[inline(always)]
-            pub fn from_two_vectors_normalised(v1: $vname, v2: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, v1.norm_squared(), 1.0));
-                debug_assert!(float_cmp::approx_eq!($t, v2.norm_squared(), 1.0));
-                let c = v1.dot(v2);
+            pub fn from_two_vectors_normalised(from: $vname, to: $vname) -> Self {
+                debug_assert!(float_cmp::approx_eq!($t, from.norm_squared(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, to.norm_squared(), 1.0));
+                let c = from.dot(to);
                 if c < -1.0 + $eps {
-                    Self::new(0.0, v1.compute_perpendicular())
+                    Self::from_vector(from.compute_perpendicular())
                 } else {
-                    let axis = v1.cross(v2);
+                    let axis = from.cross(to);
                     let s = (2.0 * (1.0 + c)).sqrt();
                     let inv_s = 1.0 / s;
                     Self::new(0.5 * s, inv_s * axis)
@@ -74,8 +74,8 @@ macro_rules! generate_quaternion {
             /// Create quaternion as rotation between two vectors.
             /// Vector are not expected to be normalised.
             #[inline(always)]
-            pub fn from_two_vectors(v1: $vname, v2: $vname) -> Self {
-                Self::from_two_vectors_normalised(v1.normalised(), v2.normalised())
+            pub fn from_two_vectors(from: $vname, to: $vname) -> Self {
+                Self::from_two_vectors_normalised(from.normalised(), to.normalised())
             }
 
             /// Create rotation versor. Assumes axis has unit length.
