@@ -1,19 +1,8 @@
 use crate::{Axis3, Vec3f32, Vec3f64};
-use std::{
-    f32, f64,
-    ops::{Add, Div, Mul, Sub},
-};
+use std::ops::{Add, Div, Mul, Sub};
 
 macro_rules! generate_quaternion {
     ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr, $eps:expr) => {
-        /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
-        #[derive(Copy, Clone, Debug, Default, PartialEq)]
-        #[repr(C)]
-        pub struct $name {
-            pub scalar: $t,
-            pub complex: $vname,
-        }
-
         #[derive(Copy, Clone)]
         pub enum $euler_name {
             Normal($t, $t, $t),
@@ -28,6 +17,14 @@ macro_rules! generate_quaternion {
                     Self::Singularity(t0, t1) => (t0, t1, 0.0),
                 }
             }
+        }
+
+        /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
+        #[derive(Copy, Clone, Debug, Default, PartialEq)]
+        #[repr(C)]
+        pub struct $name {
+            pub scalar: $t,
+            pub complex: $vname,
         }
 
         impl $name {
@@ -276,7 +273,7 @@ generate_quaternion!(
     EulerDecompositionf32,
     Vec3f32,
     f32,
-    f32::consts::FRAC_PI_2,
+    std::f32::consts::FRAC_PI_2,
     1e-5
 );
 generate_quaternion!(
@@ -284,6 +281,6 @@ generate_quaternion!(
     EulerDecompositionf64,
     Vec3f64,
     f64,
-    f64::consts::FRAC_PI_2,
+    std::f64::consts::FRAC_PI_2,
     1e-12
 );
