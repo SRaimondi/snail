@@ -1,7 +1,4 @@
-use std::{
-    f32, f64,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub, SubAssign},
-};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub, SubAssign};
 
 macro_rules! generate_complex {
     ($name:ident, $t:ty, $pi:expr) => {
@@ -198,5 +195,5 @@ macro_rules! generate_complex {
     };
 }
 
-generate_complex!(Complexf32, f32, f32::consts::PI);
-generate_complex!(Complexf64, f64, f64::consts::PI);
+generate_complex!(Complexf32, f32, std::f32::consts::PI);
+generate_complex!(Complexf64, f64, std::f64::consts::PI);
