@@ -169,10 +169,11 @@ macro_rules! generate_quaternion {
             }
 
             /// Extract the Euler angles for the given order from the quaternion.
-            /// The output order is the same as the given one.
+            /// The output angles are ordered the same way rotations should be applied .0, .1 and .2
             /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
             #[inline]
             pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
+                debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
                 // Naming
                 let p0 = self.scalar;
                 let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
