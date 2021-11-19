@@ -1,5 +1,5 @@
 use crate::{Axis3, Vec3f32, Vec3f64};
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, Sub, Neg};
 
 macro_rules! generate_quaternion {
     ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr, $eps:expr) => {
@@ -239,6 +239,15 @@ macro_rules! generate_quaternion {
                         + rhs.scalar * self.complex
                         + self.complex.cross(rhs.complex),
                 )
+            }
+        }
+
+        impl Neg for $name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn neg(self) -> Self::Output {
+                Self::Output::new(-self.scalar, -self.complex)
             }
         }
     };
