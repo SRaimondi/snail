@@ -145,7 +145,7 @@ macro_rules! generate_quaternion {
             /// Extract angle of the quaternion
             #[inline(always)]
             pub fn angle(self) -> $t {
-                debug_assert!(float_cmp::approx_eq!($t, axis.norm_squared(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
                 2.0 * self.scalar.acos()
             }
 
