@@ -439,17 +439,17 @@ macro_rules! generate_vec3 {
             }
         }
 
-        impl std::convert::Into<($t, $t, $t)> for $name {
+        impl std::convert::From<$name> for ($t, $t, $t) {
             #[inline(always)]
-            fn into(self) -> ($t, $t, $t) {
-                (self.x(), self.y(), self.z())
+            fn from(v: $name) -> ($t, $t, $t) {
+                (v.x(), v.y(), v.z())
             }
         }
 
-        impl std::convert::Into<[$t; 3]> for $name {
+        impl std::convert::From<$name> for [$t; 3] {
             #[inline(always)]
-            fn into(self) -> [$t; 3] {
-                self.elements
+            fn from(v: $name) -> [$t; 3] {
+                v.elements
             }
         }
     };
