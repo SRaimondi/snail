@@ -52,6 +52,7 @@ mod tests {
         }
     }
 
+    use std::f32::consts::{PI, FRAC_PI_2, FRAC_PI_4};
     use super::*;
 
     fn check_vector_eps(r: Vec3f32, e: Vec3f32, eps: f32) {
@@ -62,6 +63,11 @@ mod tests {
 
     fn check_vector(r: Vec3f32, e: Vec3f32) {
         check_vector_eps(r, e, 0.00001);
+    }
+
+    fn check_quaternion(r: Quaternionf32, e: Quaternionf32) {
+        float_cmp::assert_approx_eq!(f32, r.scalar, e.scalar);
+        check_vector_eps(r.complex, e.complex, float_cmp::F32Margin::default().epsilon);
     }
 
     #[test]
@@ -323,5 +329,20 @@ mod tests {
 
             compare_dot(r_euler.dot(r));
         }
+    }
+
+    #[test]
+    fn test_rotation_to() {
+        let q0 = Quaternionf32::identity_rotation();
+        let q1 = -Quaternionf32::identity_rotation();
+        check_quaternion(q0.rotation_to(q1), -Quaternionf32::identity_rotation());
+
+        let q0 = Quaternionf32::identity_rotation();
+        let q1 = Quaternionf32::x_rotation(FRAC_PI_2 + FRAC_PI_4);
+        check_quaternion(q0.rotation_to(q1), q1);
+
+        let q0 = Quaternionf32::x_rotation(FRAC_PI_4);
+        let q1 = Quaternionf32::x_rotation(PI + FRAC_PI_4);
+        check_quaternion(q0.rotation_to(q1), Quaternionf32::x_rotation(PI));
     }
 }

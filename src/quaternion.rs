@@ -86,6 +86,12 @@ macro_rules! generate_quaternion {
                 Self::new(c, s * axis)
             }
 
+            /// Create identity versor.
+            #[inline(always)]
+            pub const fn identity_rotation() -> Self {
+                Self::from_components(1.0, 0.0, 0.0, 0.0)
+            }
+
             /// Create rotation around the x axis for the given angle.
             #[inline(always)]
             pub fn x_rotation(angle: $t) -> Self {
@@ -142,7 +148,7 @@ macro_rules! generate_quaternion {
                 self.conjugate() / self.norm_squared()
             }
 
-            /// Extract angle of the quaternion
+            /// Extract angle of the quaternion.
             #[inline(always)]
             pub fn angle(self) -> $t {
                 debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
@@ -198,6 +204,16 @@ macro_rules! generate_quaternion {
                         (2.0 * (p0 * p3 - e * p1 * p2)).atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
                     )
                 }
+            }
+
+            /// Compute a quaternion q such that q * self = target.
+            #[inline]
+            pub fn rotation_to(self, target: Self) -> Self {
+                debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
+                debug_assert!(float_cmp::approx_eq!($t, target.norm_squared(), 1.0));
+                // The right part should be the inverse but as the squared norm is assumed to be 1,
+                // we can simply multiply by the conjugate
+                target * self.conjugate()
             }
         }
 
