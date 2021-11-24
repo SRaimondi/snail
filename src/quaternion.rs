@@ -191,7 +191,6 @@ macro_rules! generate_quaternion {
             /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
             #[inline]
             pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
-                debug_assert!(self.is_unit());
                 // Naming
                 let p0 = self.scalar;
                 let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
@@ -205,7 +204,7 @@ macro_rules! generate_quaternion {
                 } else {
                     $euler_name::Normal(
                         (2.0 * (p0 * p1 - e * p2 * p3)).atan2(1.0 - 2.0 * (p1 * p1 + p2 * p2)),
-                        (2.0 * s_test).asin(),
+                        (2.0 * s_test).clamp(-1.0, 1.0).asin(),
                         (2.0 * (p0 * p3 - e * p1 * p2)).atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
                     )
                 }
