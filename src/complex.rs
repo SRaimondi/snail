@@ -47,7 +47,7 @@ macro_rules! generate_complex {
                 Self::new(self.real, -self.im)
             }
 
-            /// Extract angle.
+            /// Extract angle in the range [0; tau).
             #[inline(always)]
             pub fn angle(self) -> $t {
                 let a = self.im.atan2(self.real);

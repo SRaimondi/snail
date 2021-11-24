@@ -1,5 +1,5 @@
 use crate::{Axis3, Vec3f32, Vec3f64};
-use std::ops::{Add, Div, Mul, Sub, Neg};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 macro_rules! generate_quaternion {
     ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr, $eps:expr) => {
@@ -20,7 +20,7 @@ macro_rules! generate_quaternion {
         }
 
         /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
-        #[derive(Copy, Clone, Debug, Default, PartialEq)]
+        #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
             pub scalar: $t,

@@ -23,13 +23,15 @@ impl Axis3 {
 
 macro_rules! generate_vec3 {
     ($name:ident, $t:ty) => {
-        #[derive(Copy, Clone, Debug, Default, PartialEq)]
+        #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
             elements: [$t; 3],
         }
 
         impl $name {
+            /// Associated constant representing the zero vector.
+            pub const ZERO: Self = Self::broadcast(0.0);
             /// Associated constant representing the x axis.
             pub const EX: Self = Self::new(1.0, 0.0, 0.0);
             /// Associated constant representing the y axis.
@@ -112,18 +114,12 @@ macro_rules! generate_vec3 {
                 self.elements.into_iter()
             }
 
-            /// Number of elements in the vector.
-            #[inline(always)]
-            pub const fn len(self) -> usize {
-                3
-            }
-
             /// Access a component by value using an index.
             /// # Safety
             /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour.
             #[inline(always)]
             pub unsafe fn get_unchecked(self, i: usize) -> $t {
-                debug_assert!(i < self.len());
+                debug_assert!(i < self.elements.len());
                 *self.elements.get_unchecked(i)
             }
 
@@ -132,7 +128,7 @@ macro_rules! generate_vec3 {
             /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour.
             #[inline(always)]
             pub unsafe fn get_unchecked_mut(&mut self, i: usize) -> &mut $t {
-                debug_assert!(i < self.len());
+                debug_assert!(i < self.elements.len());
                 self.elements.get_unchecked_mut(i)
             }
 
@@ -140,7 +136,7 @@ macro_rules! generate_vec3 {
             /// Returns None if the index is out of range.
             #[inline(always)]
             pub fn get(self, i: usize) -> Option<$t> {
-                if i < self.len() {
+                if i < self.elements.len() {
                     Some(unsafe { self.get_unchecked(i) })
                 } else {
                     None
@@ -151,11 +147,19 @@ macro_rules! generate_vec3 {
             /// Returns None if the index is out of range.
             #[inline(always)]
             pub fn get_mut(&mut self, i: usize) -> Option<&mut $t> {
-                if i < self.len() {
+                if i < self.elements.len() {
                     Some(unsafe { self.get_unchecked_mut(i) })
                 } else {
                     None
                 }
+            }
+
+            /// Check if this vector and other are approximate equal.
+            #[inline(always)]
+            pub fn approx_eq(self, other: Self) -> bool {
+                float_cmp::approx_eq!($t, self.x(), other.x())
+                    && float_cmp::approx_eq!($t, self.y(), other.y())
+                    && float_cmp::approx_eq!($t, self.z(), other.z())
             }
 
             /// Compute minimum value for each component.

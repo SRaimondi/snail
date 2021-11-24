@@ -52,8 +52,8 @@ mod tests {
         }
     }
 
-    use std::f32::consts::{PI, FRAC_PI_2, FRAC_PI_4};
     use super::*;
+    use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI};
 
     fn check_vector_eps(r: Vec3f32, e: Vec3f32, eps: f32) {
         float_cmp::assert_approx_eq!(f32, r.x(), e.x(), epsilon = eps);
@@ -67,7 +67,11 @@ mod tests {
 
     fn check_quaternion(r: Quaternionf32, e: Quaternionf32) {
         float_cmp::assert_approx_eq!(f32, r.scalar, e.scalar);
-        check_vector_eps(r.complex, e.complex, float_cmp::F32Margin::default().epsilon);
+        check_vector_eps(
+            r.complex,
+            e.complex,
+            float_cmp::F32Margin::default().epsilon,
+        );
     }
 
     #[test]
