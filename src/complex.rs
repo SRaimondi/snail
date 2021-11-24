@@ -114,8 +114,8 @@ macro_rules! generate_complex {
             fn div(self, rhs: Self) -> Self::Output {
                 let n2 = rhs.norm_squared();
                 debug_assert!(n2 > 0.0);
-                let r = (self.real * rhs.real + self.im * rhs.im);
-                let im = (self.im * rhs.real - self.real * rhs.im);
+                let r = self.real * rhs.real + self.im * rhs.im;
+                let im = self.im * rhs.real - self.real * rhs.im;
                 Self::Output::new(r / n2, im / n2)
             }
         }

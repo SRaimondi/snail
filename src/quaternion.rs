@@ -110,10 +110,16 @@ macro_rules! generate_quaternion {
                 Self::from_rotation(angle, $vname::EZ)
             }
 
+            /// Check if it's a unit quaternion.
+            #[inline(always)]
+            pub fn is_unit(self) -> bool {
+                float_cmp::approx_eq!($t, self.norm_squared(), 1.0)
+            }
+
             /// Compute squared norm of the quaternion.
             #[inline(always)]
             pub fn norm_squared(self) -> $t {
-                self.scalar * self.scalar + self.complex.norm_squared()
+                self.dot(self)
             }
 
             /// Compute norm of the quaternion.
@@ -186,7 +192,7 @@ macro_rules! generate_quaternion {
             /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
             #[inline]
             pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
-                debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
+                debug_assert!(self.is_unit());
                 // Naming
                 let p0 = self.scalar;
                 let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
@@ -209,8 +215,8 @@ macro_rules! generate_quaternion {
             /// Compute a quaternion q such that q * self = target.
             #[inline]
             pub fn rotation_to(self, target: Self) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, self.norm_squared(), 1.0));
-                debug_assert!(float_cmp::approx_eq!($t, target.norm_squared(), 1.0));
+                debug_assert!(self.is_unit());
+                debug_assert!(target.is_unit());
                 // The right part should be the inverse but as the squared norm is assumed to be 1,
                 // we can simply multiply by the conjugate
                 target * self.conjugate()
