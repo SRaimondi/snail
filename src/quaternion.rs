@@ -157,7 +157,6 @@ macro_rules! generate_quaternion {
             /// Extract angle of the quaternion.
             #[inline(always)]
             pub fn angle(self) -> $t {
-                debug_assert!(self.is_unit());
                 2.0 * self.scalar.clamp(-1.0, 1.0).acos()
             }
 
