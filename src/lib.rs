@@ -1,5 +1,3 @@
-extern crate core;
-
 pub use complex::*;
 pub use quaternion::*;
 pub use vec::*;
@@ -7,6 +5,9 @@ pub use vec::*;
 pub mod complex;
 pub mod quaternion;
 pub mod vec;
+
+const F32_EPS: f32 = 1e-5;
+const F64_EPS: f64 = 1e-12;
 
 #[cfg(test)]
 mod tests {

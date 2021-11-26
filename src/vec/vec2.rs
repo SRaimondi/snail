@@ -20,7 +20,7 @@ impl Axis2 {
 }
 
 macro_rules! generate_vec2 {
-    ($name:ident, $t:ty) => {
+    ($name:ident, $t:ty, $eps:expr) => {
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
@@ -135,8 +135,8 @@ macro_rules! generate_vec2 {
             /// Check if this vector and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
-                float_cmp::approx_eq!($t, self.x(), other.x())
-                    && float_cmp::approx_eq!($t, self.y(), other.y())
+                float_cmp::approx_eq!($t, self.x(), other.x(), epsilon = $eps)
+                    && float_cmp::approx_eq!($t, self.y(), other.y(), epsilon = $eps)
             }
 
             /// Compute minimum value for each component.
@@ -401,5 +401,5 @@ macro_rules! generate_vec2 {
     };
 }
 
-generate_vec2!(Vec2f32, f32);
-generate_vec2!(Vec2f64, f64);
+generate_vec2!(Vec2f32, f32, crate::F32_EPS);
+generate_vec2!(Vec2f64, f64, crate::F64_EPS);
