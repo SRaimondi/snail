@@ -110,19 +110,19 @@ macro_rules! generate_quaternion {
             /// Create rotation around the x axis for the given angle.
             #[inline(always)]
             pub fn x_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::EX)
+                Self::from_rotation(angle, $vname::UNIT_X)
             }
 
             /// Create rotation around the y axis for the given angle.
             #[inline(always)]
             pub fn y_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::EY)
+                Self::from_rotation(angle, $vname::UNIT_Y)
             }
 
             /// Create rotation around the z axis for the given angle.
             #[inline(always)]
             pub fn z_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::EZ)
+                Self::from_rotation(angle, $vname::UNIT_Z)
             }
 
             /// Check if it's a unit quaternion.

@@ -88,17 +88,17 @@ mod tests {
     fn test_rotate() {
         use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI};
         let q = Quaternionf32::from_rotation(PI, Vec3f32::new(0.0, 1.0, 0.0));
-        q.rotate(Vec3f32::EX).approx_eq(-Vec3f32::EX);
+        q.rotate(Vec3f32::UNIT_X).approx_eq(-Vec3f32::UNIT_X);
 
         assert!(Quaternionf32::x_rotation(FRAC_PI_4)
-            .rotate(Vec3f32::EY)
+            .rotate(Vec3f32::UNIT_Y)
             .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),);
         assert!(Quaternionf32::x_rotation(-FRAC_PI_4)
-            .rotate(Vec3f32::EY)
+            .rotate(Vec3f32::UNIT_Y)
             .approx_eq(Vec3f32::new(0.0, 1.0, -1.0).normalised()));
         assert!(Quaternionf32::x_rotation(PI)
-            .rotate(Vec3f32::EY)
-            .approx_eq(-Vec3f32::EY));
+            .rotate(Vec3f32::UNIT_Y)
+            .approx_eq(-Vec3f32::UNIT_Y));
 
         let v = Vec3f32::broadcast(1.0).normalised();
         assert!(Quaternionf32::y_rotation(PI)
@@ -115,12 +115,12 @@ mod tests {
             .approx_eq(Vec3f32::new(-1.0, -1.0, 1.0).normalised()),);
         assert!(
             (Quaternionf32::x_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(FRAC_PI_2))
-                .rotate(Vec3f32::EX)
-                .approx_eq(Vec3f32::EY),
+                .rotate(Vec3f32::UNIT_X)
+                .approx_eq(Vec3f32::UNIT_Y),
         );
         assert!(
             (Quaternionf32::z_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(-FRAC_PI_4))
-                .rotate(Vec3f32::EX)
+                .rotate(Vec3f32::UNIT_X)
                 .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),
         );
     }
