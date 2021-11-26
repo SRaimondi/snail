@@ -5,9 +5,9 @@ use std::ops::{
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Axis3 {
-    X = 0,
-    Y = 1,
-    Z = 2,
+    X,
+    Y,
+    Z,
 }
 
 impl Axis3 {
