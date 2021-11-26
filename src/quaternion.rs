@@ -58,8 +58,18 @@ macro_rules! generate_quaternion {
             /// Vector are expected to be normalised.
             #[inline(always)]
             pub fn from_two_vectors_normalised(from: $vname, to: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, from.norm_squared(), 1.0, epsilon = $eps));
-                debug_assert!(float_cmp::approx_eq!($t, to.norm_squared(), 1.0, epsilon = $eps));
+                debug_assert!(float_cmp::approx_eq!(
+                    $t,
+                    from.norm_squared(),
+                    1.0,
+                    epsilon = $eps
+                ));
+                debug_assert!(float_cmp::approx_eq!(
+                    $t,
+                    to.norm_squared(),
+                    1.0,
+                    epsilon = $eps
+                ));
                 let c = from.dot(to);
                 if c < -1.0 + $eps {
                     Self::from_vector(from.compute_perpendicular())
@@ -81,7 +91,12 @@ macro_rules! generate_quaternion {
             /// Create rotation versor. Assumes axis has unit length.
             #[inline(always)]
             pub fn from_rotation(angle: $t, axis: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!($t, axis.norm_squared(), 1.0, epsilon = $eps));
+                debug_assert!(float_cmp::approx_eq!(
+                    $t,
+                    axis.norm_squared(),
+                    1.0,
+                    epsilon = $eps
+                ));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
             }

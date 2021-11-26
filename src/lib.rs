@@ -6,8 +6,8 @@ pub mod complex;
 pub mod quaternion;
 pub mod vec;
 
-const F32_EPS: f32 = 1e-5;
-const F64_EPS: f64 = 1e-12;
+pub const F32_EPS: f32 = 1e-5;
+pub const F64_EPS: f64 = 1e-12;
 
 #[cfg(test)]
 mod tests {
@@ -56,23 +56,9 @@ mod tests {
     use super::*;
     use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI};
 
-    fn check_vector_eps(r: Vec3f32, e: Vec3f32, eps: f32) {
-        float_cmp::assert_approx_eq!(f32, r.x(), e.x(), epsilon = eps);
-        float_cmp::assert_approx_eq!(f32, r.y(), e.y(), epsilon = eps);
-        float_cmp::assert_approx_eq!(f32, r.z(), e.z(), epsilon = eps);
-    }
-
-    fn check_vector(r: Vec3f32, e: Vec3f32) {
-        check_vector_eps(r, e, 0.00001);
-    }
-
     fn check_quaternion(r: Quaternionf32, e: Quaternionf32) {
-        float_cmp::assert_approx_eq!(f32, r.scalar, e.scalar);
-        check_vector_eps(
-            r.complex,
-            e.complex,
-            float_cmp::F32Margin::default().epsilon,
-        );
+        float_cmp::assert_approx_eq!(f32, r.scalar, e.scalar, epsilon = F32_EPS);
+        r.complex.approx_eq(e.complex);
     }
 
     #[test]
@@ -82,66 +68,60 @@ mod tests {
         let v1 = Vec3f32::new(0.0, 1.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
         let v = q.rotate(v0);
-        check_vector(v, v1);
+        assert!(v.approx_eq(v1));
 
         // Rotation between the same vector
         let v0 = Vec3f32::new(1.0, 0.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v0);
         let v = q.rotate(v0);
-        check_vector(v, v0);
+        assert!(v.approx_eq(v0));
 
         // Rotation between opposite vectors
         let v0 = Vec3f32::new(1.0, 0.0, 0.0);
         let v1 = Vec3f32::new(-1.0, 0.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
         let v = q.rotate(v0);
-        check_vector(v, v1);
+        v.approx_eq(v1);
     }
 
     #[test]
     fn test_rotate() {
         use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI};
         let q = Quaternionf32::from_rotation(PI, Vec3f32::new(0.0, 1.0, 0.0));
-        check_vector(q.rotate(Vec3f32::EX), -Vec3f32::EX);
+        q.rotate(Vec3f32::EX).approx_eq(-Vec3f32::EX);
 
-        check_vector(
-            Quaternionf32::x_rotation(FRAC_PI_4).rotate(Vec3f32::EY),
-            Vec3f32::new(0.0, 1.0, 1.0).normalised(),
-        );
-        check_vector(
-            Quaternionf32::x_rotation(-FRAC_PI_4).rotate(Vec3f32::EY),
-            Vec3f32::new(0.0, 1.0, -1.0).normalised(),
-        );
-        check_vector(
-            Quaternionf32::x_rotation(PI).rotate(Vec3f32::EY),
-            -Vec3f32::EY,
-        );
+        assert!(Quaternionf32::x_rotation(FRAC_PI_4)
+            .rotate(Vec3f32::EY)
+            .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),);
+        assert!(Quaternionf32::x_rotation(-FRAC_PI_4)
+            .rotate(Vec3f32::EY)
+            .approx_eq(Vec3f32::new(0.0, 1.0, -1.0).normalised()));
+        assert!(Quaternionf32::x_rotation(PI)
+            .rotate(Vec3f32::EY)
+            .approx_eq(-Vec3f32::EY));
+
         let v = Vec3f32::broadcast(1.0).normalised();
-        check_vector(
-            Quaternionf32::y_rotation(PI).rotate(v),
-            Vec3f32::new(-1.0, 1.0, -1.0).normalised(),
-        );
-        check_vector(
-            Quaternionf32::z_rotation(FRAC_PI_2).rotate(v),
-            Vec3f32::new(-1.0, 1.0, 1.0).normalised(),
-        );
-        check_vector(
-            Quaternionf32::z_rotation(-FRAC_PI_2).rotate(v),
-            Vec3f32::new(1.0, -1.0, 1.0).normalised(),
-        );
-        check_vector(
-            Quaternionf32::z_rotation(PI).rotate(v),
-            Vec3f32::new(-1.0, -1.0, 1.0).normalised(),
-        );
-        check_vector(
+        assert!(Quaternionf32::y_rotation(PI)
+            .rotate(v)
+            .approx_eq(Vec3f32::new(-1.0, 1.0, -1.0).normalised()),);
+        assert!(Quaternionf32::z_rotation(FRAC_PI_2)
+            .rotate(v)
+            .approx_eq(Vec3f32::new(-1.0, 1.0, 1.0).normalised()),);
+        assert!(Quaternionf32::z_rotation(-FRAC_PI_2)
+            .rotate(v)
+            .approx_eq(Vec3f32::new(1.0, -1.0, 1.0).normalised()),);
+        assert!(Quaternionf32::z_rotation(PI)
+            .rotate(v)
+            .approx_eq(Vec3f32::new(-1.0, -1.0, 1.0).normalised()),);
+        assert!(
             (Quaternionf32::x_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(FRAC_PI_2))
-                .rotate(Vec3f32::EX),
-            Vec3f32::EY,
+                .rotate(Vec3f32::EX)
+                .approx_eq(Vec3f32::EY),
         );
-        check_vector(
+        assert!(
             (Quaternionf32::z_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(-FRAC_PI_4))
-                .rotate(Vec3f32::EX),
-            Vec3f32::new(0.0, 1.0, 1.0).normalised(),
+                .rotate(Vec3f32::EX)
+                .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),
         );
     }
 
@@ -181,23 +161,17 @@ mod tests {
             let z_q = Quaternionf32::z_rotation(z_angle);
 
             let q = (z_q * y_q * x_q).normalised();
-
             let v = sample_sphere(&mut pcg32);
             let r = q.rotate(v);
 
-            let r_euler = match q.extract_euler_angles(EulerOrder::XYZ) {
-                EulerDecompositionf32::Normal(t0, t1, t2) => (Quaternionf32::z_rotation(t2)
-                    * Quaternionf32::y_rotation(t1)
-                    * Quaternionf32::x_rotation(t0))
-                .normalised()
-                .rotate(v),
-                EulerDecompositionf32::Singularity(t0, t1) => (Quaternionf32::y_rotation(t1)
-                    * Quaternionf32::x_rotation(t0))
-                .normalised()
-                .rotate(v),
-            };
+            let (rx, ry, rz) = q.extract_euler_angles(EulerOrder::XYZ).into();
+            let res = (Quaternionf32::z_rotation(rz)
+                * Quaternionf32::y_rotation(ry)
+                * Quaternionf32::x_rotation(rx))
+            .normalised()
+            .rotate(v);
 
-            compare_dot(r_euler.dot(r));
+            compare_dot(res.dot(r));
         }
 
         // YZX order
@@ -212,19 +186,14 @@ mod tests {
             let v = sample_sphere(&mut pcg32);
             let r = q.rotate(v);
 
-            let r_euler = match q.extract_euler_angles(EulerOrder::YZX) {
-                EulerDecompositionf32::Normal(t0, t1, t2) => (Quaternionf32::x_rotation(t2)
-                    * Quaternionf32::z_rotation(t1)
-                    * Quaternionf32::y_rotation(t0))
+            let (ry, rz, rx) = q.extract_euler_angles(EulerOrder::YZX).into();
+            let res = (Quaternionf32::x_rotation(rx)
+                * Quaternionf32::z_rotation(rz)
+                * Quaternionf32::y_rotation(ry))
                 .normalised()
-                .rotate(v),
-                EulerDecompositionf32::Singularity(t0, t1) => (Quaternionf32::z_rotation(t1)
-                    * Quaternionf32::y_rotation(t0))
-                .normalised()
-                .rotate(v),
-            };
+                .rotate(v);
 
-            compare_dot(r_euler.dot(r));
+            compare_dot(res.dot(r));
         }
 
         // ZXY order
