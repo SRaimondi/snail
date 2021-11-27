@@ -5,13 +5,13 @@ pub trait ApproxEq: Sized {
     fn approx_eq_eps(self, other: Self, rel_eps: Self, abs_eps: Self) -> bool;
 
     #[inline(always)]
-    fn approx_eq_def_rel(self, other: Self, abs_eps: Self) -> bool {
-        self.approx_eq_eps(other, Self::DEFAULT_RELATIVE_EPS, abs_eps)
+    fn approx_eq_rel_eps(self, other: Self, rel_eps: Self) -> bool {
+        self.approx_eq_eps(other, rel_eps, Self::DEFAULT_ABSOLUTE_EPS)
     }
 
     #[inline(always)]
-    fn approx_eq_def_abs(self, other: Self, rel_eps: Self) -> bool {
-        self.approx_eq_eps(other, rel_eps, Self::DEFAULT_ABSOLUTE_EPS)
+    fn approx_eq_abs_eps(self, other: Self, abs_eps: Self) -> bool {
+        self.approx_eq_eps(other, Self::DEFAULT_RELATIVE_EPS, abs_eps)
     }
 
     #[inline(always)]

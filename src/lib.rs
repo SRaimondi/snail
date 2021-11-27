@@ -144,7 +144,7 @@ mod tests {
 
         let check_dot = |a: Vec3f32, b: Vec3f32| {
             // The precision here is arbitrary, we want to make sure the two final vectors are close enough
-            assert!(a.dot(b).approx_eq_def_rel(1.0, 0.00005));
+            assert!(a.dot(b).approx_eq_rel_eps(1.0, 0.00005));
         };
 
         // XYZ order
