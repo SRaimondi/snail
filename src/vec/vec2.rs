@@ -1,3 +1,4 @@
+use crate::ApproxEq;
 use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
@@ -141,8 +142,7 @@ macro_rules! generate_vec2 {
             /// Check if this vector and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
-                float_cmp::approx_eq!($t, self.x(), other.x(), epsilon = $eps)
-                    && float_cmp::approx_eq!($t, self.y(), other.y(), epsilon = $eps)
+                self.x().approx_eq(other.x()) && self.y().approx_eq(other.y())
             }
 
             /// Compute minimum value for each component.

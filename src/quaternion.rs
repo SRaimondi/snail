@@ -1,8 +1,8 @@
-use crate::{Axis3, Vec3f32, Vec3f64};
+use crate::{ApproxEq, Axis3, Vec3f32, Vec3f64};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 macro_rules! generate_quaternion {
-    ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr, $eps:expr) => {
+    ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr) => {
         #[derive(Copy, Clone)]
         pub enum $euler_name {
             Normal($t, $t, $t),
@@ -58,20 +58,11 @@ macro_rules! generate_quaternion {
             /// Vector are expected to be normalised.
             #[inline(always)]
             pub fn from_two_vectors_normalised(from: $vname, to: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!(
-                    $t,
-                    from.norm_squared(),
-                    1.0,
-                    epsilon = $eps
-                ));
-                debug_assert!(float_cmp::approx_eq!(
-                    $t,
-                    to.norm_squared(),
-                    1.0,
-                    epsilon = $eps
-                ));
+                debug_assert!(from.norm().approx_eq(1.0));
+                debug_assert!(to.norm().approx_eq(1.0));
+
                 let c = from.dot(to);
-                if c < -1.0 + $eps {
+                if c < -1.0 + <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
                     Self::from_vector(from.compute_perpendicular())
                 } else {
                     let axis = from.cross(to);
@@ -91,20 +82,21 @@ macro_rules! generate_quaternion {
             /// Create rotation versor. Assumes axis has unit length.
             #[inline(always)]
             pub fn from_rotation(angle: $t, axis: $vname) -> Self {
-                debug_assert!(float_cmp::approx_eq!(
-                    $t,
-                    axis.norm_squared(),
-                    1.0,
-                    epsilon = $eps
-                ));
+                debug_assert!(axis.norm().approx_eq(1.0));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
             }
 
             /// Create identity versor.
             #[inline(always)]
-            pub const fn identity_rotation() -> Self {
+            pub const fn identity() -> Self {
                 Self::from_components(1.0, 0.0, 0.0, 0.0)
+            }
+
+            /// Check if this quaternion and other are approximate equal.
+            #[inline(always)]
+            pub fn approx_eq(self, other: Self) -> bool {
+                self.scalar.approx_eq(other.scalar) && self.complex.approx_eq(other.complex)
             }
 
             /// Create rotation around the x axis for the given angle.
@@ -128,7 +120,7 @@ macro_rules! generate_quaternion {
             /// Check if it's a unit quaternion.
             #[inline(always)]
             pub fn is_unit(self) -> bool {
-                float_cmp::approx_eq!($t, self.norm_squared(), 1.0, epsilon = $eps)
+                self.norm().approx_eq(1.0)
             }
 
             /// Compute squared norm of the quaternion.
@@ -215,7 +207,7 @@ macro_rules! generate_quaternion {
 
                 // Test if we are at a singularity
                 let s_test = p0 * p2 + e * p1 * p3;
-                if s_test.abs() > 0.5 - $eps {
+                if s_test.abs() > 0.5 - <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
                     $euler_name::Singularity(2.0 * p1.atan2(p0), $pi_2.copysign(s_test))
                 } else {
                     $euler_name::Normal(
@@ -326,14 +318,12 @@ generate_quaternion!(
     EulerDecompositionf32,
     Vec3f32,
     f32,
-    std::f32::consts::FRAC_PI_2,
-    crate::F32_EPS
+    std::f32::consts::FRAC_PI_2
 );
 generate_quaternion!(
     Quaternionf64,
     EulerDecompositionf64,
     Vec3f64,
     f64,
-    std::f64::consts::FRAC_PI_2,
-    crate::F64_EPS
+    std::f64::consts::FRAC_PI_2
 );

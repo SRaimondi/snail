@@ -1,3 +1,4 @@
+use crate::ApproxEq;
 use std::{
     f32, f64,
     ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub, SubAssign},
@@ -30,6 +31,12 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn from_angle(angle: $t) -> Self {
                 Self::from_polar(1.0, angle)
+            }
+
+            /// Check if this complex and other are approximate equal.
+            #[inline(always)]
+            pub fn approx_eq(self, other: Self) -> bool {
+                self.real.approx_eq(other.real) && self.im.approx_eq(other.im)
             }
 
             /// Compute squared norm.
