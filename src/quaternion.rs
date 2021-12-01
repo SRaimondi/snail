@@ -120,7 +120,7 @@ macro_rules! generate_quaternion {
             /// Check if it's a unit quaternion.
             #[inline(always)]
             pub fn is_unit(self) -> bool {
-                self.norm().approx_eq_abs_eps(1.0, 0.00001)
+                self.norm().approx_eq_abs_eps(1.0, 0.0001)
             }
 
             /// Compute squared norm of the quaternion.
