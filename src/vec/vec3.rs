@@ -3,6 +3,7 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
+/// Enum used to represent the axes for Vec3.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Axis3 {
@@ -12,6 +13,7 @@ pub enum Axis3 {
 }
 
 impl Axis3 {
+    /// Get the value of the next axis looping back from z to x.
     #[inline(always)]
     pub const fn next(self) -> Self {
         match self {
@@ -167,6 +169,19 @@ macro_rules! generate_vec3 {
                 self.x().approx_eq(other.x())
                     && self.y().approx_eq(other.y())
                     && self.z().approx_eq(other.z())
+            }
+
+            /// Apply element wise function to create a new vector.
+            #[inline(always)]
+            pub fn element_wise_apply<F>(self, rhs: Self, mut f: F) -> Self
+            where
+                F: FnMut($t, $t) -> $t,
+            {
+                Self::new(
+                    f(self.x(), rhs.x()),
+                    f(self.y(), rhs.y()),
+                    f(self.z(), rhs.z()),
+                )
             }
 
             /// Compute minimum value for each component.

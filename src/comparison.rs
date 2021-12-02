@@ -1,19 +1,26 @@
+/// Trait to compare the type with itself for some given epsilons.
 pub trait ApproxEq: Sized {
+    /// Default epsilon for relative comparison.
     const DEFAULT_RELATIVE_EPS: Self;
+    /// Default epsilon for absolute comparison.
     const DEFAULT_ABSOLUTE_EPS: Self;
 
+    /// Compute with the other value using the given epsilon values.
     fn approx_eq_eps(self, other: Self, rel_eps: Self, abs_eps: Self) -> bool;
 
+    /// Compare with the other value using the given relative epsilon and the default absolute one.
     #[inline(always)]
     fn approx_eq_rel_eps(self, other: Self, rel_eps: Self) -> bool {
         self.approx_eq_eps(other, rel_eps, Self::DEFAULT_ABSOLUTE_EPS)
     }
 
+    /// Compare with the other value using the given absolute epsilon and the default relative one.
     #[inline(always)]
     fn approx_eq_abs_eps(self, other: Self, abs_eps: Self) -> bool {
         self.approx_eq_eps(other, Self::DEFAULT_RELATIVE_EPS, abs_eps)
     }
 
+    /// Compute with the other value using the default epsilon values.
     #[inline(always)]
     fn approx_eq(self, other: Self) -> bool {
         self.approx_eq_eps(
@@ -23,8 +30,10 @@ pub trait ApproxEq: Sized {
         )
     }
 
+    /// Check if the value is zero for the given epsilon.
     fn approx_zero_eps(self, eps: Self) -> bool;
 
+    /// Check if the value is zero for the default absolute epsilon.
     #[inline(always)]
     fn approx_zero(self) -> bool {
         self.approx_zero_eps(Self::DEFAULT_ABSOLUTE_EPS)

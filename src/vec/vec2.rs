@@ -3,6 +3,7 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
+/// Enum used to represent the axes for Vec2.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[repr(u8)]
 pub enum Axis2 {
@@ -11,6 +12,7 @@ pub enum Axis2 {
 }
 
 impl Axis2 {
+    /// Get the value of the next axis looping back from y to x.
     #[inline(always)]
     pub const fn next(self) -> Self {
         match self {
@@ -143,6 +145,15 @@ macro_rules! generate_vec2 {
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
                 self.x().approx_eq(other.x()) && self.y().approx_eq(other.y())
+            }
+
+            /// Apply element wise function to create a new vector.
+            #[inline(always)]
+            pub fn element_wise_apply<F>(self, rhs: Self, mut f: F) -> Self
+            where
+                F: FnMut($t, $t) -> $t,
+            {
+                Self::new(f(self.x(), rhs.x()), f(self.y(), rhs.y()))
             }
 
             /// Compute minimum value for each component.
