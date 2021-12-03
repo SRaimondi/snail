@@ -1,39 +1,35 @@
 use crate::ApproxEq;
 use std::{
     f32, f64,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign},
 };
 
 macro_rules! generate_complex {
-    ($name:ident, $t:ty, $pi:expr, $tau:expr) => {
-        #[derive(Copy, Clone, Debug, Default, PartialEq)]
+    ($cartesian_name:ident, $polar_name:ident, $t:ty, $pi:expr, $tau:expr) => {
+        /// Cartesian complex number representation.
+        #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
-        pub struct $name {
+        pub struct $cartesian_name {
             pub real: $t,
             pub im: $t,
         }
 
-        impl $name {
+        impl $cartesian_name {
             /// Create complex number from the given values.
             #[inline(always)]
             pub const fn new(real: $t, im: $t) -> Self {
                 Self { real, im }
             }
 
-            /// Create complex number from polar representation.
+            /// Convert to polar form with angle in the range [0, tau)
             #[inline(always)]
-            pub fn from_polar(radius: $t, angle: $t) -> Self {
-                let (s, c) = angle.sin_cos();
-                Self::new(radius * c, radius * s)
+            pub fn to_polar(self) -> $polar_name {
+                let a = self.im.atan2(self.real);
+                let angle = if a < 0.0 { a + $tau } else { a };
+                $polar_name::new(self.norm(), angle)
             }
 
-            /// Create complex number with radius 1 and for the given angle.
-            #[inline(always)]
-            pub fn from_angle(angle: $t) -> Self {
-                Self::from_polar(1.0, angle)
-            }
-
-            /// Check if this complex and other are approximate equal.
+            /// Check for equality with other.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
                 self.real.approx_eq(other.real) && self.im.approx_eq(other.im)
@@ -57,29 +53,12 @@ macro_rules! generate_complex {
                 Self::new(self.real, -self.im)
             }
 
-            /// Extract angle in the range [0; tau).
-            #[inline(always)]
-            pub fn angle(self) -> $t {
-                let a = self.im.atan2(self.real);
-                if a < 0.0 {
-                    a + $tau
-                } else {
-                    a
-                }
-            }
-
             /// Compute reciprocal.
             #[inline(always)]
             pub fn recip(self) -> Self {
                 let n2 = self.norm_squared();
                 debug_assert!(n2 > 0.0);
                 Self::new(self.real / n2, -self.im / n2)
-            }
-
-            /// Extract polar representation.
-            #[inline(always)]
-            pub fn polar(self) -> ($t, $t) {
-                (self.norm(), self.angle())
             }
 
             /// Normalise complex number to have norm 1.
@@ -100,7 +79,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Add for $name {
+        impl Add for $cartesian_name {
             type Output = Self;
 
             #[inline(always)]
@@ -109,7 +88,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl AddAssign for $name {
+        impl AddAssign for $cartesian_name {
             #[inline(always)]
             fn add_assign(&mut self, rhs: Self) {
                 self.real += rhs.real;
@@ -117,37 +96,24 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Div for $name {
+        impl Sub for $cartesian_name {
             type Output = Self;
 
             #[inline(always)]
-            fn div(self, rhs: Self) -> Self::Output {
-                let n2 = rhs.norm_squared();
-                debug_assert!(n2 > 0.0);
-                let r = self.real * rhs.real + self.im * rhs.im;
-                let im = self.im * rhs.real - self.real * rhs.im;
-                Self::Output::new(r / n2, im / n2)
+            fn sub(self, rhs: Self) -> Self::Output {
+                Self::Output::new(self.real - rhs.real, self.im - rhs.im)
             }
         }
 
-        impl Div<$t> for $name {
-            type Output = Self;
-
+        impl SubAssign for $cartesian_name {
             #[inline(always)]
-            fn div(self, rhs: $t) -> Self::Output {
-                Self::Output::new(self.real / rhs, self.im / rhs)
+            fn sub_assign(&mut self, rhs: Self) {
+                self.real -= rhs.real;
+                self.im -= rhs.im;
             }
         }
 
-        impl DivAssign<$t> for $name {
-            #[inline(always)]
-            fn div_assign(&mut self, rhs: $t) {
-                self.real /= rhs;
-                self.im /= rhs;
-            }
-        }
-
-        impl Mul for $name {
+        impl Mul for $cartesian_name {
             type Output = Self;
 
             #[inline(always)]
@@ -159,7 +125,7 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Mul<$t> for $name {
+        impl Mul<$t> for $cartesian_name {
             type Output = Self;
 
             #[inline(always)]
@@ -168,16 +134,34 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Mul<$name> for $t {
-            type Output = $name;
+        impl Mul<$cartesian_name> for $t {
+            type Output = $cartesian_name;
 
             #[inline(always)]
-            fn mul(self, rhs: $name) -> Self::Output {
+            fn mul(self, rhs: $cartesian_name) -> Self::Output {
                 Self::Output::new(self * rhs.real, self * rhs.im)
             }
         }
 
-        impl Neg for $name {
+        impl Div for $cartesian_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div(self, rhs: Self) -> Self::Output {
+                self * rhs.recip()
+            }
+        }
+
+        impl Div<$t> for $cartesian_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div(self, rhs: $t) -> Self::Output {
+                Self::Output::new(self.real / rhs, self.im / rhs)
+            }
+        }
+
+        impl Neg for $cartesian_name {
             type Output = Self;
 
             #[inline(always)]
@@ -186,24 +170,107 @@ macro_rules! generate_complex {
             }
         }
 
-        impl Sub for $name {
-            type Output = Self;
+        /// Polar complex number representation.
+        #[derive(Copy, Clone, Debug, Default)]
+        #[repr(C)]
+        pub struct $polar_name {
+            pub radius: $t,
+            pub angle: $t,
+        }
 
+        impl $polar_name {
+            /// Create polar complex number from the given values.
             #[inline(always)]
-            fn sub(self, rhs: Self) -> Self::Output {
-                Self::Output::new(self.real - rhs.real, self.im - rhs.im)
+            pub fn new(radius: $t, angle: $t) -> Self {
+                debug_assert!(radius >= 0.0);
+                Self { radius, angle }
+            }
+
+            /// Create polar complex number of radius 1 for the given angle.
+            #[inline(always)]
+            pub fn unit_from_angle(angle: $t) -> Self {
+                Self::new(1.0, angle)
+            }
+
+            /// Normalise complex number to have norm 1.
+            #[inline(always)]
+            pub fn normalise(&mut self) {
+                self.radius = 1.0;
+            }
+
+            /// Return a new Complex number with norm 1.
+            #[inline(always)]
+            pub fn normalised(self) -> Self {
+                Self::new(1.0, self.angle)
+            }
+
+            /// Create cartesian complex number.
+            #[inline(always)]
+            pub fn to_cartesian(self) -> $cartesian_name {
+                let (s, c) = self.angle.sin_cos();
+                $cartesian_name::new(c * self.radius, s * self.radius)
             }
         }
 
-        impl SubAssign for $name {
+        impl Mul for $polar_name {
+            type Output = Self;
+
             #[inline(always)]
-            fn sub_assign(&mut self, rhs: Self) {
-                self.real -= rhs.real;
-                self.im -= rhs.im;
+            fn mul(self, rhs: Self) -> Self::Output {
+                Self::Output::new(self.radius * rhs.radius, self.angle + rhs.angle)
+            }
+        }
+
+        impl Mul<$t> for $polar_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn mul(self, rhs: $t) -> Self::Output {
+                Self::Output::new(self.radius * rhs, self.angle)
+            }
+        }
+
+        impl Mul<$polar_name> for $t {
+            type Output = $polar_name;
+
+            #[inline(always)]
+            fn mul(self, rhs: $polar_name) -> Self::Output {
+                Self::Output::new(self * rhs.radius, rhs.angle)
+            }
+        }
+
+        impl Div for $polar_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div(self, rhs: Self) -> Self::Output {
+                debug_assert!(rhs.radius > 0.0);
+                Self::Output::new(self.radius / rhs.radius, self.angle - rhs.angle)
+            }
+        }
+
+        impl Neg for $polar_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn neg(self) -> Self::Output {
+                Self::Output::new(self.radius, self.angle + $pi)
             }
         }
     };
 }
 
-generate_complex!(Complexf32, f32, f32::consts::PI, f32::consts::TAU);
-generate_complex!(Complexf64, f64, f64::consts::PI, f64::consts::TAU);
+generate_complex!(
+    ComplexCartesianf32,
+    ComplexPolarf32,
+    f32,
+    f32::consts::PI,
+    f32::consts::TAU
+);
+generate_complex!(
+    ComplexCartesianf64,
+    ComplexPolaref64,
+    f64,
+    f64::consts::PI,
+    f64::consts::TAU
+);
