@@ -3,9 +3,12 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 macro_rules! generate_quaternion {
     ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr) => {
+        /// Enum representing the result of the decomposition in Euler angles.
         #[derive(Copy, Clone)]
         pub enum $euler_name {
+            /// All angles are used for the rotation.
             Normal($t, $t, $t),
+            /// We are at a singularity, the last angle has value 0.
             Singularity($t, $t),
         }
 
@@ -28,6 +31,9 @@ macro_rules! generate_quaternion {
         }
 
         impl $name {
+            /// Identity rotation quaternion.
+            pub const IDENTITY: Self = Self::from_components(1.0, 0.0, 0.0, 0.0);
+
             /// Create new quaternion from the given components.
             #[inline(always)]
             pub const fn from_components(
@@ -85,12 +91,6 @@ macro_rules! generate_quaternion {
                 debug_assert!(axis.norm().approx_eq(1.0));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
-            }
-
-            /// Create identity versor.
-            #[inline(always)]
-            pub const fn identity() -> Self {
-                Self::from_components(1.0, 0.0, 0.0, 0.0)
             }
 
             /// Check if this quaternion and other are approximate equal.
@@ -164,6 +164,7 @@ macro_rules! generate_quaternion {
             /// Extract angle of the quaternion.
             #[inline(always)]
             pub fn angle(self) -> $t {
+                debug_assert!(self.scalar <= 1.0);
                 2.0 * self.scalar.clamp(-1.0, 1.0).acos()
             }
 

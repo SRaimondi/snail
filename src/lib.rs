@@ -275,11 +275,11 @@ mod tests {
 
     #[test]
     fn test_rotation_to() {
-        let q0 = Quaternionf32::identity();
-        let q1 = -Quaternionf32::identity();
-        assert!(q0.rotation_to(q1).approx_eq(-Quaternionf32::identity()));
+        let q0 = Quaternionf32::IDENTITY;
+        let q1 = -Quaternionf32::IDENTITY;
+        assert!(q0.rotation_to(q1).approx_eq(-Quaternionf32::IDENTITY));
 
-        let q0 = Quaternionf32::identity();
+        let q0 = Quaternionf32::IDENTITY;
         let q1 = Quaternionf32::x_rotation(FRAC_PI_2 + FRAC_PI_4);
         assert!(q0.rotation_to(q1).approx_eq(q1));
 
