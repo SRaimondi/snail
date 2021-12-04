@@ -20,7 +20,7 @@ pub trait ApproxEq: Sized {
         self.approx_eq_eps(other, Self::DEFAULT_RELATIVE_EPS, abs_eps)
     }
 
-    /// Compute with the other value using the default epsilon values.
+    /// Compare with the other value using the default epsilon values.
     #[inline(always)]
     fn approx_eq(self, other: Self) -> bool {
         self.approx_eq_eps(
