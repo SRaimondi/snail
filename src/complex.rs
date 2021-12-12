@@ -147,6 +147,7 @@ macro_rules! generate_complex {
             type Output = Self;
 
             #[inline(always)]
+            #[allow(clippy::suspicious_arithmetic_impl)]
             fn div(self, rhs: Self) -> Self::Output {
                 self * rhs.recip()
             }

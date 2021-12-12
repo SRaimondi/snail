@@ -1,11 +1,11 @@
 use crate::ApproxEq;
-use std::ops::{
-    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
+use std::{
+    convert::From,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
 /// Enum used to represent the axes for Vec3.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[repr(u8)]
 pub enum Axis3 {
     X,
     Y,
@@ -29,7 +29,9 @@ macro_rules! generate_vec3 {
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
-            elements: [$t; 3],
+            pub x: $t,
+            pub y: $t,
+            pub z: $t,
         }
 
         impl $name {
@@ -45,29 +47,13 @@ macro_rules! generate_vec3 {
             /// Create new vector from the given coordinates.
             #[inline(always)]
             pub const fn new(x: $t, y: $t, z: $t) -> Self {
-                Self {
-                    elements: [x, y, z],
-                }
+                Self { x, y, z }
             }
 
             /// Create new vector with all components set to the given value.
             #[inline(always)]
             pub const fn broadcast(v: $t) -> Self {
                 Self::new(v, v, v)
-            }
-
-            /// Create new vector from the given array.
-            #[inline(always)]
-            pub const fn from_array(components: [$t; 3]) -> Self {
-                Self {
-                    elements: components,
-                }
-            }
-
-            /// Create new vector from slice.
-            #[inline(always)]
-            pub const fn from_slice(s: &[$t]) -> Self {
-                Self::new(s[0], s[1], s[2])
             }
 
             /// Create new vector from the given polar representation.
@@ -81,160 +67,75 @@ macro_rules! generate_vec3 {
                 Self::new(r_xz * c_phi, radius * c_theta, r_xz * s_phi)
             }
 
-            /// Access x components by value.
-            #[inline(always)]
-            pub const fn x(self) -> $t {
-                self.elements[Axis3::X as usize]
-            }
-
-            /// Access y components by value.
-            #[inline(always)]
-            pub const fn y(self) -> $t {
-                self.elements[Axis3::Y as usize]
-            }
-
-            /// Access z components by value.
-            #[inline(always)]
-            pub const fn z(self) -> $t {
-                self.elements[Axis3::Z as usize]
-            }
-
-            /// Access x components as mutable reference.
-            #[inline(always)]
-            pub fn x_mut(&mut self) -> &mut $t {
-                &mut self.elements[Axis3::X as usize]
-            }
-
-            /// Access y components as mutable reference.
-            #[inline(always)]
-            pub fn y_mut(&mut self) -> &mut $t {
-                &mut self.elements[Axis3::Y as usize]
-            }
-
-            /// Access z components as mutable reference.
-            #[inline(always)]
-            pub fn z_mut(&mut self) -> &mut $t {
-                &mut self.elements[Axis3::Z as usize]
-            }
-
-            /// Iterate over the elements by value.
-            #[inline(always)]
-            pub fn iter(self) -> std::array::IntoIter<$t, 3> {
-                self.elements.into_iter()
-            }
-
-            /// Access a component by value using an index.
-            /// # Safety
-            /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour.
-            #[inline(always)]
-            pub unsafe fn get_unchecked(self, i: usize) -> $t {
-                debug_assert!(i < self.elements.len());
-                *self.elements.get_unchecked(i)
-            }
-
-            /// Access a component by index and returns a mutable reference to it.
-            /// # Safety
-            /// The index should either be 0, 1 or 2, otherwise we get undefined behaviour.
-            #[inline(always)]
-            pub unsafe fn get_unchecked_mut(&mut self, i: usize) -> &mut $t {
-                debug_assert!(i < self.elements.len());
-                self.elements.get_unchecked_mut(i)
-            }
-
-            /// Access a component by value using an index.
-            /// Returns None if the index is out of range.
-            #[inline(always)]
-            pub fn get(self, i: usize) -> Option<$t> {
-                if i < self.elements.len() {
-                    Some(unsafe { self.get_unchecked(i) })
-                } else {
-                    None
-                }
-            }
-
-            /// Access a component by mutable reference using an index.
-            /// Returns None if the index is out of range.
-            #[inline(always)]
-            pub fn get_mut(&mut self, i: usize) -> Option<&mut $t> {
-                if i < self.elements.len() {
-                    Some(unsafe { self.get_unchecked_mut(i) })
-                } else {
-                    None
-                }
-            }
-
             /// Check if this vector and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
-                self.x().approx_eq(other.x())
-                    && self.y().approx_eq(other.y())
-                    && self.z().approx_eq(other.z())
-            }
-
-            /// Apply element wise function to create a new vector.
-            #[inline(always)]
-            pub fn element_wise_apply<F>(self, rhs: Self, mut f: F) -> Self
-            where
-                F: FnMut($t, $t) -> $t,
-            {
-                Self::new(
-                    f(self.x(), rhs.x()),
-                    f(self.y(), rhs.y()),
-                    f(self.z(), rhs.z()),
-                )
+                self.x.approx_eq(other.x) && self.y.approx_eq(other.y) && self.z.approx_eq(other.z)
             }
 
             /// Compute minimum value for each component.
             #[inline(always)]
-            pub fn element_wise_min(self, rhs: Self) -> Self {
+            pub fn min(self, rhs: Self) -> Self {
+                Self::new(self.x.min(rhs.x), self.y.min(rhs.y), self.z.min(rhs.z))
+            }
+
+            /// Compute minimum value for each component assuming there are no NaNs.
+            #[inline(always)]
+            pub fn min_fast(self, rhs: Self) -> Self {
                 Self::new(
-                    self.x().min(rhs.x()),
-                    self.y().min(rhs.y()),
-                    self.z().min(rhs.z()),
+                    super::min_helper(self.x, rhs.x),
+                    super::min_helper(self.y, rhs.y),
+                    super::min_helper(self.z, rhs.z),
                 )
             }
 
             /// Compute maximum value for each component.
             #[inline(always)]
-            pub fn element_wise_max(self, rhs: Self) -> Self {
+            pub fn max(self, rhs: Self) -> Self {
+                Self::new(self.x.max(rhs.x), self.y.max(rhs.y), self.z.max(rhs.z))
+            }
+
+            /// Compute maximum value for each component assuming there are no NaNs.
+            #[inline(always)]
+            pub fn max_fast(self, rhs: Self) -> Self {
                 Self::new(
-                    self.x().max(rhs.x()),
-                    self.y().max(rhs.y()),
-                    self.z().max(rhs.z()),
+                    super::max_helper(self.x, rhs.x),
+                    super::max_helper(self.y, rhs.y),
+                    super::max_helper(self.z, rhs.z),
                 )
             }
 
             /// Compute product for each component.
             #[inline(always)]
-            pub fn element_wise_product(self, rhs: Self) -> Self {
-                Self::new(self.x() * rhs.x(), self.y() * rhs.y(), self.z() * rhs.z())
+            pub fn product(self, rhs: Self) -> Self {
+                Self::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
             }
 
             /// Compute quotient for each component.
             #[inline(always)]
-            pub fn element_wise_quotient(self, rhs: Self) -> Self {
-                Self::new(self.x() / rhs.x(), self.y() / rhs.y(), self.z() / rhs.z())
+            pub fn quotient(self, rhs: Self) -> Self {
+                Self::new(self.x / rhs.x, self.y / rhs.y, self.z / rhs.z)
             }
 
             /// Compute absolute value for each component.
             #[inline(always)]
-            pub fn element_wise_abs(self) -> Self {
-                Self::new(self.x().abs(), self.y().abs(), self.z().abs())
+            pub fn abs(self) -> Self {
+                Self::new(self.x.abs(), self.y.abs(), self.z.abs())
             }
 
             /// Compute reciprocal value for each component.
             #[inline(always)]
-            pub fn element_wise_recip(self) -> Self {
-                Self::new(self.x().recip(), self.y().recip(), self.z().recip())
+            pub fn recip(self) -> Self {
+                Self::new(self.x.recip(), self.y.recip(), self.z.recip())
             }
 
             /// Clamp each value between the given min and max.
             #[inline(always)]
-            pub fn element_wise_clamp(self, min: $t, max: $t) -> Self {
+            pub fn clamp(self, min: $t, max: $t) -> Self {
                 Self::new(
-                    self.x().clamp(min, max),
-                    self.y().clamp(min, max),
-                    self.z().clamp(min, max),
+                    self.x.clamp(min, max),
+                    self.y.clamp(min, max),
+                    self.z.clamp(min, max),
                 )
             }
 
@@ -260,9 +161,9 @@ macro_rules! generate_vec3 {
             pub fn normalise(&mut self) {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
-                *self.x_mut() /= n;
-                *self.y_mut() /= n;
-                *self.z_mut() /= n;
+                self.x /= n;
+                self.y /= n;
+                self.z /= n;
             }
 
             /// Normalise vector in place using multiplication.
@@ -271,9 +172,9 @@ macro_rules! generate_vec3 {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
                 let inv_n = 1.0 / n;
-                *self.x_mut() *= inv_n;
-                *self.y_mut() *= inv_n;
-                *self.z_mut() *= inv_n;
+                self.x *= inv_n;
+                self.y *= inv_n;
+                self.z *= inv_n;
             }
 
             /// Linearly interpolate for each component.
@@ -286,16 +187,16 @@ macro_rules! generate_vec3 {
             #[inline(always)]
             pub fn cross(self, rhs: Self) -> Self {
                 Self::new(
-                    self.y() * rhs.z() - self.z() * rhs.y(),
-                    self.z() * rhs.x() - self.x() * rhs.z(),
-                    self.x() * rhs.y() - self.y() * rhs.x(),
+                    self.y * rhs.z - self.z * rhs.y,
+                    self.z * rhs.x - self.x * rhs.z,
+                    self.x * rhs.y - self.y * rhs.x,
                 )
             }
 
             /// Compute dot product.
             #[inline(always)]
             pub fn dot(self, rhs: Self) -> $t {
-                self.x() * rhs.x() + self.y() * rhs.y() + self.z() * rhs.z()
+                self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
             }
 
             /// Compute squared length of the vector.
@@ -313,19 +214,51 @@ macro_rules! generate_vec3 {
             /// Compute minimum element.
             #[inline(always)]
             pub fn min_element(self) -> $t {
-                self.x().min(self.y().min(self.z()))
+                self.x.min(self.y.min(self.z))
+            }
+
+            /// Compute minimum element assuming there are no NaNs.
+            #[inline(always)]
+            pub fn min_element_fast(self) -> $t {
+                super::min3_helper(self.x, self.y, self.z)
             }
 
             /// Compute maximum element.
             #[inline(always)]
             pub fn max_element(self) -> $t {
-                self.x().max(self.y().max(self.z()))
+                self.x.max(self.y.max(self.z))
+            }
+
+            /// Compute maximum element assuming there are no NaNs.
+            #[inline(always)]
+            pub fn max_element_fast(self) -> $t {
+                super::max3_helper(self.x, self.y, self.z)
+            }
+
+            /// Get element for the given axis.
+            #[inline(always)]
+            pub fn axis(self, axis: Axis3) -> $t {
+                match axis {
+                    Axis3::X => self.x,
+                    Axis3::Y => self.y,
+                    Axis3::Z => self.z,
+                }
+            }
+
+            /// Get mutable reference to element for the given axis.
+            #[inline(always)]
+            pub fn axis_mut(&mut self, axis: Axis3) -> &mut $t {
+                match axis {
+                    Axis3::X => &mut self.x,
+                    Axis3::Y => &mut self.y,
+                    Axis3::Z => &mut self.z,
+                }
             }
 
             /// Permute components for the given new axes.
             #[inline(always)]
             pub fn permute(self, x_axis: Axis3, y_axis: Axis3, z_axis: Axis3) -> Self {
-                Self::new(self[x_axis], self[y_axis], self[z_axis])
+                Self::new(self.axis(x_axis), self.axis(y_axis), self.axis(z_axis))
             }
 
             /// Permute components for the given new axes as array.
@@ -337,9 +270,9 @@ macro_rules! generate_vec3 {
             /// Compute largest axis of the vector.
             #[inline(always)]
             pub fn largest_axis(self) -> Axis3 {
-                if self.x() >= self.y() && self.x() >= self.z() {
+                if self.x >= self.y && self.x >= self.z {
                     Axis3::X
-                } else if self.y() >= self.z() {
+                } else if self.y >= self.z {
                     Axis3::Y
                 } else {
                     Axis3::Z
@@ -349,12 +282,12 @@ macro_rules! generate_vec3 {
             /// Compute perpendicular vector.
             #[inline(always)]
             pub fn compute_perpendicular(self) -> Self {
-                if self.x().abs() > self.y().abs() {
-                    let n = (self.x() * self.x() + self.z() * self.z()).sqrt();
-                    Self::new(-self.z() / n, 0.0, self.x() / n)
+                if self.x.abs() > self.y.abs() {
+                    let n = (self.x * self.x + self.z * self.z).sqrt();
+                    Self::new(-self.z / n, 0.0, self.x / n)
                 } else {
-                    let n = (self.y() * self.y() + self.z() * self.z()).sqrt();
-                    Self::new(0.0, self.z() / n, -self.y() / n)
+                    let n = (self.y * self.y + self.z * self.z).sqrt();
+                    Self::new(0.0, self.z / n, -self.y / n)
                 }
             }
         }
@@ -364,16 +297,16 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn add(self, rhs: Self) -> Self {
-                Self::new(self.x() + rhs.x(), self.y() + rhs.y(), self.z() + rhs.z())
+                Self::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
             }
         }
 
         impl AddAssign for $name {
             #[inline(always)]
             fn add_assign(&mut self, rhs: Self) {
-                *self.x_mut() += rhs.x();
-                *self.y_mut() += rhs.y();
-                *self.z_mut() += rhs.z();
+                self.x += rhs.x;
+                self.y += rhs.y;
+                self.z += rhs.z;
             }
         }
 
@@ -382,16 +315,16 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn sub(self, rhs: Self) -> Self {
-                Self::new(self.x() - rhs.x(), self.y() - rhs.y(), self.z() - rhs.z())
+                Self::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
             }
         }
 
         impl SubAssign for $name {
             #[inline(always)]
             fn sub_assign(&mut self, rhs: Self) {
-                *self.x_mut() -= rhs.x();
-                *self.y_mut() -= rhs.y();
-                *self.z_mut() -= rhs.z();
+                self.x -= rhs.x;
+                self.y -= rhs.y;
+                self.z -= rhs.z;
             }
         }
 
@@ -400,7 +333,7 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn mul(self, rhs: $name) -> Self::Output {
-                Self::Output::new(self * rhs.x(), self * rhs.y(), self * rhs.z())
+                Self::Output::new(self * rhs.x, self * rhs.y, self * rhs.z)
             }
         }
 
@@ -409,16 +342,16 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn mul(self, rhs: $t) -> Self::Output {
-                Self::Output::new(self.x() * rhs, self.y() * rhs, self.z() * rhs)
+                Self::Output::new(self.x * rhs, self.y * rhs, self.z * rhs)
             }
         }
 
         impl MulAssign<$t> for $name {
             #[inline(always)]
             fn mul_assign(&mut self, rhs: $t) {
-                *self.x_mut() *= rhs;
-                *self.y_mut() *= rhs;
-                *self.z_mut() *= rhs;
+                self.x *= rhs;
+                self.y *= rhs;
+                self.z *= rhs;
             }
         }
 
@@ -427,7 +360,7 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn neg(self) -> Self::Output {
-                Self::Output::new(-self.x(), -self.y(), -self.z())
+                Self::Output::new(-self.x, -self.y, -self.z)
             }
         }
 
@@ -436,46 +369,30 @@ macro_rules! generate_vec3 {
 
             #[inline(always)]
             fn div(self, rhs: $t) -> Self::Output {
-                Self::Output::new(self.x() / rhs, self.y() / rhs, self.z() / rhs)
+                Self::Output::new(self.x / rhs, self.y / rhs, self.z / rhs)
             }
         }
 
         impl DivAssign<$t> for $name {
             #[inline(always)]
             fn div_assign(&mut self, rhs: $t) {
-                *self.x_mut() /= rhs;
-                *self.y_mut() /= rhs;
-                *self.z_mut() /= rhs;
+                self.x /= rhs;
+                self.y /= rhs;
+                self.z /= rhs;
             }
         }
 
-        impl Index<Axis3> for $name {
-            type Output = $t;
-
-            #[inline(always)]
-            fn index(&self, index: Axis3) -> &Self::Output {
-                &self.elements[index as usize]
-            }
-        }
-
-        impl IndexMut<Axis3> for $name {
-            #[inline(always)]
-            fn index_mut(&mut self, index: Axis3) -> &mut Self::Output {
-                &mut self.elements[index as usize]
-            }
-        }
-
-        impl std::convert::From<$name> for ($t, $t, $t) {
+        impl From<$name> for ($t, $t, $t) {
             #[inline(always)]
             fn from(v: $name) -> ($t, $t, $t) {
-                (v.x(), v.y(), v.z())
+                (v.x, v.y, v.z)
             }
         }
 
-        impl std::convert::From<$name> for [$t; 3] {
+        impl From<$name> for [$t; 3] {
             #[inline(always)]
             fn from(v: $name) -> [$t; 3] {
-                v.elements
+                [v.x, v.y, v.z]
             }
         }
     };

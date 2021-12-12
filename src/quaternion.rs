@@ -1,5 +1,8 @@
 use crate::{ApproxEq, Axis3, Vec3f32, Vec3f64};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{
+    convert::Into,
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
 macro_rules! generate_quaternion {
     ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr) => {
@@ -12,7 +15,8 @@ macro_rules! generate_quaternion {
             Singularity($t, $t),
         }
 
-        impl std::convert::Into<($t, $t, $t)> for $euler_name {
+        #[allow(clippy::from_over_into)]
+        impl Into<($t, $t, $t)> for $euler_name {
             #[inline(always)]
             fn into(self) -> ($t, $t, $t) {
                 match self {
@@ -22,7 +26,7 @@ macro_rules! generate_quaternion {
             }
         }
 
-        /// q = q_scalar + complex.x() * i + complex.y() * j + complex.z() * k.
+        /// q = q_scalar + complex.x * i + complex.y * j + complex.z * k.
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
@@ -173,24 +177,24 @@ macro_rules! generate_quaternion {
             pub fn rotate(self, v: $vname) -> $vname {
                 // Naming
                 let qw = self.scalar;
-                let qx = self.complex.x();
-                let qy = self.complex.y();
-                let qz = self.complex.z();
+                let qx = self.complex.x;
+                let qy = self.complex.y;
+                let qz = self.complex.z;
 
                 let qx_2 = qx * qx;
                 let qy_2 = qy * qy;
                 let qz_2 = qz * qz;
 
                 $vname::new(
-                    v.x() * (1.0 - 2.0 * (qy_2 + qz_2))
-                        + 2.0 * v.y() * (qx * qy - qw * qz)
-                        + 2.0 * v.z() * (qx * qz + qw * qy),
-                    2.0 * v.x() * (qw * qz + qx * qy)
-                        + v.y() * (1.0 - 2.0 * (qx_2 + qz_2))
-                        + 2.0 * v.z() * (qy * qz - qw * qx),
-                    2.0 * v.x() * (qx * qz - qw * qy)
-                        + 2.0 * v.y() * (qy * qz + qw * qx)
-                        + v.z() * (1.0 - 2.0 * (qx_2 + qy_2)),
+                    v.x * (1.0 - 2.0 * (qy_2 + qz_2))
+                        + 2.0 * v.y * (qx * qy - qw * qz)
+                        + 2.0 * v.z * (qx * qz + qw * qy),
+                    2.0 * v.x * (qw * qz + qx * qy)
+                        + v.y * (1.0 - 2.0 * (qx_2 + qz_2))
+                        + 2.0 * v.z * (qy * qz - qw * qx),
+                    2.0 * v.x * (qx * qz - qw * qy)
+                        + 2.0 * v.y * (qy * qz + qw * qx)
+                        + v.z * (1.0 - 2.0 * (qx_2 + qy_2)),
                 )
             }
 

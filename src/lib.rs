@@ -11,7 +11,6 @@ pub mod vec;
 #[cfg(test)]
 mod tests {
     #[derive(Copy, Clone)]
-    #[repr(C)]
     pub struct Pcg32 {
         state: u64,
         stream: u64,
@@ -80,7 +79,6 @@ mod tests {
 
     #[test]
     fn test_rotate() {
-        use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI};
         let q = Quaternionf32::from_rotation(PI, Vec3f32::new(0.0, 1.0, 0.0));
         q.rotate(Vec3f32::UNIT_X).approx_eq(-Vec3f32::UNIT_X);
 
@@ -126,7 +124,6 @@ mod tests {
         let mut pcg32 = Pcg32::default();
 
         let generate_angles = |rng: &mut Pcg32| {
-            use std::f32::consts::PI;
             (
                 PI * rng.next_f32(),
                 PI * rng.next_f32(),
