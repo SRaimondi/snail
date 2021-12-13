@@ -23,7 +23,7 @@ impl Axis2 {
 }
 
 macro_rules! generate_vec2 {
-    ($name:ident, $t:ty, $eps:expr) => {
+    ($name:ident, $t:ty) => {
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
@@ -358,5 +358,5 @@ macro_rules! generate_vec2 {
     };
 }
 
-generate_vec2!(Vec2f32, f32, crate::F32_EPS);
-generate_vec2!(Vec2f64, f64, crate::F64_EPS);
+generate_vec2!(Vec2f32, f32);
+generate_vec2!(Vec2f64, f64);

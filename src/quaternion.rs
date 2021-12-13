@@ -5,7 +5,7 @@ use std::{
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $euler_name:ident, $vname:ident, $t:ty, $pi_2:expr) => {
+    ($name:ident, $euler_name:ident, $vec_name:ident, $t:ty, $pi_2:expr) => {
         /// Enum representing the result of the decomposition in Euler angles.
         #[derive(Copy, Clone)]
         pub enum $euler_name {
@@ -31,7 +31,7 @@ macro_rules! generate_quaternion {
         #[repr(C)]
         pub struct $name {
             pub scalar: $t,
-            pub complex: $vname,
+            pub complex: $vec_name,
         }
 
         impl $name {
@@ -48,26 +48,26 @@ macro_rules! generate_quaternion {
             ) -> Self {
                 Self {
                     scalar,
-                    complex: $vname::new(complex_x, complex_y, complex_z),
+                    complex: $vec_name::new(complex_x, complex_y, complex_z),
                 }
             }
 
             /// Create new quaternion from the given scalar and complex parts.
             #[inline(always)]
-            pub const fn new(scalar: $t, complex: $vname) -> Self {
+            pub const fn new(scalar: $t, complex: $vec_name) -> Self {
                 Self { scalar, complex }
             }
 
             /// Create pure quaternion from the given vector.
             #[inline(always)]
-            pub const fn from_vector(v: $vname) -> Self {
+            pub const fn from_vector(v: $vec_name) -> Self {
                 Self::new(0.0, v)
             }
 
             /// Create quaternion as rotation between two vectors.
             /// Vector are expected to be normalised.
             #[inline(always)]
-            pub fn from_two_vectors_normalised(from: $vname, to: $vname) -> Self {
+            pub fn from_two_vectors_normalised(from: $vec_name, to: $vec_name) -> Self {
                 debug_assert!(from.norm().approx_eq(1.0));
                 debug_assert!(to.norm().approx_eq(1.0));
 
@@ -85,13 +85,13 @@ macro_rules! generate_quaternion {
             /// Create quaternion as rotation between two vectors.
             /// Vector are not expected to be normalised.
             #[inline(always)]
-            pub fn from_two_vectors(from: $vname, to: $vname) -> Self {
+            pub fn from_two_vectors(from: $vec_name, to: $vec_name) -> Self {
                 Self::from_two_vectors_normalised(from.normalised(), to.normalised())
             }
 
             /// Create rotation versor. Assumes axis has unit length.
             #[inline(always)]
-            pub fn from_rotation(angle: $t, axis: $vname) -> Self {
+            pub fn from_rotation(angle: $t, axis: $vec_name) -> Self {
                 debug_assert!(axis.norm().approx_eq(1.0));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
@@ -106,19 +106,19 @@ macro_rules! generate_quaternion {
             /// Create rotation around the x axis for the given angle.
             #[inline(always)]
             pub fn x_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::UNIT_X)
+                Self::from_rotation(angle, $vec_name::UNIT_X)
             }
 
             /// Create rotation around the y axis for the given angle.
             #[inline(always)]
             pub fn y_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::UNIT_Y)
+                Self::from_rotation(angle, $vec_name::UNIT_Y)
             }
 
             /// Create rotation around the z axis for the given angle.
             #[inline(always)]
             pub fn z_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vname::UNIT_Z)
+                Self::from_rotation(angle, $vec_name::UNIT_Z)
             }
 
             /// Check if it's a unit quaternion.
@@ -174,7 +174,7 @@ macro_rules! generate_quaternion {
 
             /// Apply quaternion as rotation to the given vector.
             #[inline(always)]
-            pub fn rotate(self, v: $vname) -> $vname {
+            pub fn rotate(self, v: $vec_name) -> $vec_name {
                 // Naming
                 let qw = self.scalar;
                 let qx = self.complex.x;
@@ -185,7 +185,7 @@ macro_rules! generate_quaternion {
                 let qy_2 = qy * qy;
                 let qz_2 = qz * qz;
 
-                $vname::new(
+                $vec_name::new(
                     v.x * (1.0 - 2.0 * (qy_2 + qz_2))
                         + 2.0 * v.y * (qx * qy - qw * qz)
                         + 2.0 * v.z * (qx * qz + qw * qy),

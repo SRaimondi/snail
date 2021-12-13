@@ -25,7 +25,7 @@ impl Axis3 {
 }
 
 macro_rules! generate_vec3 {
-    ($name:ident, $t:ty, $eps:expr) => {
+    ($name:ident, $t:ty) => {
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
         pub struct $name {
@@ -398,5 +398,5 @@ macro_rules! generate_vec3 {
     };
 }
 
-generate_vec3!(Vec3f32, f32, crate::F32_EPS);
-generate_vec3!(Vec3f64, f64, crate::F64_EPS);
+generate_vec3!(Vec3f32, f32);
+generate_vec3!(Vec3f64, f64);
