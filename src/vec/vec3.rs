@@ -152,8 +152,7 @@ macro_rules! generate_vec3 {
             pub fn normalised_fast(self) -> Self {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
-                let inv_n = 1.0 / n;
-                inv_n * self
+                (1.0 / n) * self
             }
 
             /// Normalise vector in place.

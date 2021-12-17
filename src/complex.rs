@@ -70,12 +70,28 @@ macro_rules! generate_complex {
                 self.im /= n;
             }
 
+            /// Normalise complex number to have norm 1 using multiplication by inverse.
+            #[inline(always)]
+            pub fn normalise_fast(&mut self) {
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                let inv_n = 1.0 / n;
+                self.real *= inv_n;
+                self.im *= inv_n;
+            }
+
             /// Return a new Complex number with norm 1.
             #[inline(always)]
             pub fn normalised(self) -> Self {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
                 Self::new(self.real / n, self.im / n)
+            }
+
+            pub fn normalised_fast(self) -> Self {
+                let n = self.norm();
+                debug_assert!(n > 0.0);
+                (1.0 / n) * self
             }
         }
 
@@ -203,6 +219,16 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub fn normalised(self) -> Self {
                 Self::new(1.0, self.angle)
+            }
+
+            /// Compute nth root. Returns the first root and the angle period as second element of the tuple.
+            #[inline(always)]
+            pub fn nth_root(self, n: u32) -> (Self, $t) {
+                let n = n as $t;
+                let radius = self.radius.powf(1.0 / n);
+                let angle = self.angle / n;
+                let period = $tau / n;
+                (Self { radius, angle }, period)
             }
 
             /// Create cartesian complex number.
