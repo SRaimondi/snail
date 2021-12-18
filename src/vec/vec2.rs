@@ -171,13 +171,13 @@ macro_rules! generate_vec2 {
                 self.x * rhs.x + self.y * rhs.y
             }
 
-            /// Compute squared length of the vector.
+            /// Compute squared norm of the vector.
             #[inline(always)]
             pub fn norm_squared(self) -> $t {
                 self.dot(self)
             }
 
-            /// Compute length of the vector.
+            /// Compute norm of the vector.
             #[inline(always)]
             pub fn norm(self) -> $t {
                 self.norm_squared().sqrt()
