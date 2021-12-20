@@ -70,28 +70,10 @@ macro_rules! generate_vec2 {
                 Self::new(self.x.min(rhs.x), self.y.min(rhs.y))
             }
 
-            /// Compute minimum value for each component assuming there are no NaNs.
-            #[inline(always)]
-            pub fn min_fast(self, rhs: Self) -> Self {
-                Self::new(
-                    super::min_helper(self.x, rhs.x),
-                    super::min_helper(self.y, rhs.y),
-                )
-            }
-
             /// Compute maximum value for each component.
             #[inline(always)]
             pub fn max(self, rhs: Self) -> Self {
                 Self::new(self.x.max(rhs.x), self.y.max(rhs.y))
-            }
-
-            /// Compute maximum value for each component assuming values are not NaNs.
-            #[inline(always)]
-            pub fn max_fast(self, rhs: Self) -> Self {
-                Self::new(
-                    super::max_helper(self.x, rhs.x),
-                    super::max_helper(self.y, rhs.y),
-                )
             }
 
             /// Compute product for each component.
@@ -189,22 +171,10 @@ macro_rules! generate_vec2 {
                 self.x.min(self.y)
             }
 
-            /// Compute minimum element assuming there are no NaNs.
-            #[inline(always)]
-            pub fn min_element_fast(self) -> $t {
-                super::min_helper(self.x, self.y)
-            }
-
             /// Compute maximum element.
             #[inline(always)]
             pub fn max_element(self) -> $t {
                 self.x.max(self.y)
-            }
-
-            /// Compute maximum element assuming there are no NaNs.
-            #[inline(always)]
-            pub fn max_element_fast(self) -> $t {
-                super::max_helper(self.x, self.y)
             }
 
             /// Get element for the given axis.
