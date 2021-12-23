@@ -199,8 +199,9 @@ macro_rules! generate_quaternion {
             /// Extract angle of the quaternion.
             #[inline(always)]
             pub fn angle(self) -> $t {
-                debug_assert!(self.scalar <= 1.0);
-                2.0 * self.scalar.clamp(-1.0, 1.0).acos()
+                // If quaternion is normalised, this should not happen
+                debug_assert!(self.scalar.abs() <= 1.0);
+                2.0 * self.scalar.acos()
             }
 
             /// Apply quaternion as rotation to the given vector.
