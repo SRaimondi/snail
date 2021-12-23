@@ -10,20 +10,18 @@ pub mod vec;
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI, TAU};
+
     #[derive(Copy, Clone)]
     pub struct Pcg32 {
         state: u64,
         stream: u64,
     }
 
-    const PCG32_DEFAULT_STATE: u64 = 0x853c49e6748fea9b;
-    const PCG32_DEFAULT_STREAM: u64 = 0xda3e39cb94b95bdb;
-    const PCG32_MULTIPLIER: u64 = 0x5851f42d4c957f2d;
-
     impl Pcg32 {
-        #[inline]
-        #[must_use]
-        pub fn next_u32(&mut self) -> u32 {
+        fn next_u32(&mut self) -> u32 {
+            const PCG32_MULTIPLIER: u64 = 0x5851f42d4c957f2d;
             let old_state = self.state;
             self.state = old_state
                 .wrapping_mul(PCG32_MULTIPLIER)
@@ -33,9 +31,7 @@ mod tests {
             (xor_shifted >> rot) | (xor_shifted << ((!rot).wrapping_add(1u32) & 31u32))
         }
 
-        #[inline]
-        #[must_use]
-        pub fn next_f32(&mut self) -> f32 {
+        fn next_f32(&mut self) -> f32 {
             let u = (self.next_u32() >> 9u32) | 0x3f800000u32;
             f32::from_bits(u) - 1.0
         }
@@ -44,6 +40,8 @@ mod tests {
     impl std::default::Default for Pcg32 {
         #[inline]
         fn default() -> Self {
+            const PCG32_DEFAULT_STATE: u64 = 0x853c49e6748fea9b;
+            const PCG32_DEFAULT_STREAM: u64 = 0xda3e39cb94b95bdb;
             Self {
                 state: PCG32_DEFAULT_STATE,
                 stream: PCG32_DEFAULT_STREAM,
@@ -51,8 +49,13 @@ mod tests {
         }
     }
 
-    use super::*;
-    use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI, TAU};
+    fn sample_sphere(rng: &mut Pcg32) -> Vec3f32 {
+        let y = 1.0 - 2.0 * rng.next_f32();
+        let r = (1.0 - y * y).max(0.0).sqrt();
+        let phi = TAU * rng.next_f32();
+        let (s, c) = phi.sin_cos();
+        Vec3f32::new(r * c, y, r * s)
+    }
 
     #[test]
     fn test_from_two_vectors() {
@@ -129,14 +132,6 @@ mod tests {
                 PI * rng.next_f32(),
                 PI * rng.next_f32(),
             )
-        };
-
-        let sample_sphere = |rng: &mut Pcg32| {
-            let y = 1.0 - 2.0 * rng.next_f32();
-            let r = (1.0 - y * y).max(0.0).sqrt();
-            let phi = TAU * rng.next_f32();
-            let (s, c) = phi.sin_cos();
-            Vec3f32::new(r * c, y, r * s)
         };
 
         let check_dot = |a: Vec3f32, b: Vec3f32| {
@@ -283,5 +278,25 @@ mod tests {
         let q0 = Quaternionf32::x_rotation(FRAC_PI_4);
         let q1 = Quaternionf32::x_rotation(PI + FRAC_PI_4);
         assert!(q0.rotation_to(q1).approx_eq(Quaternionf32::x_rotation(PI)));
+    }
+
+    #[test]
+    fn test_quaternion_from_matrix() {
+        const TESTS: usize = 10_000;
+        let mut rng = Pcg32::default();
+        for _ in 0..TESTS {
+            let s = sample_sphere(&mut rng);
+            const ROTATIONS: usize = 1_000;
+            for _ in 0..ROTATIONS {
+                let angle = rng.next_f32() * TAU;
+                let n = Quaternionf32::from_rotation(angle, s).rotate(s.compute_perpendicular());
+                let t = s.cross(n);
+                let q = Quaternionf32::from_frame(s, n, t);
+                // Check we get the original axes
+                assert!(q.rotate(Vec3f32::UNIT_X).approx_eq(s));
+                assert!(q.rotate(Vec3f32::UNIT_Y).approx_eq(n));
+                assert!(q.rotate(Vec3f32::UNIT_Z).approx_eq(t));
+            }
+        }
     }
 }

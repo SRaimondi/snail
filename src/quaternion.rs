@@ -97,6 +97,37 @@ macro_rules! generate_quaternion {
                 Self::new(c, s * axis)
             }
 
+            /// Create quaternion from given rotation matrix columns.
+            #[inline]
+            pub fn from_frame(s: $vec_name, n: $vec_name, t: $vec_name) -> Self {
+                debug_assert!(s.norm().approx_eq(1.0));
+                debug_assert!(n.norm().approx_eq(1.0));
+                debug_assert!(t.norm().approx_eq(1.0));
+                debug_assert!(s.dot(n).approx_zero());
+                debug_assert!(s.dot(t).approx_zero());
+
+                // Naming similar to http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+                let (m00, m10, m20) = s.into();
+                let (m01, m11, m21) = n.into();
+                let (m02, m12, m22) = t.into();
+
+                let trace = m00 + m11 + m22;
+                let (w, x, y, z) = if trace > 0.0 {
+                    let s = 2.0 * (1.0 + trace).sqrt();
+                    (0.25 * s, (m21 - m12) / s, (m02 - m20) / s, (m10 - m01) / s)
+                } else if m00 > m11 && m00 > m22 {
+                    let s = 2.0 * (1.0 + m00 - m11 - m22).sqrt();
+                    ((m21 - m12) / s, 0.25 * s, (m01 + m10) / s, (m02 + m20) / s)
+                } else if m11 > m22 {
+                    let s = 2.0 * (1.0 + m11 - m00 - m22).sqrt();
+                    ((m02 - m20) / s, (m01 + m10) / s, 0.25 * s, (m12 + m21) / s)
+                } else {
+                    let s = 2.0 * (1.0 + m22 - m00 - m11).sqrt();
+                    ((m10 - m01) / s, (m02 + m20) / s, (m12 + m21) / s, 0.25 * s)
+                };
+                Self::from_components(w, x, y, z)
+            }
+
             /// Check if this quaternion and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
