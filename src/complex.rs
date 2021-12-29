@@ -296,7 +296,7 @@ generate_complex!(
 );
 generate_complex!(
     ComplexCartesianf64,
-    ComplexPolaref64,
+    ComplexPolarf64,
     f64,
     f64::consts::PI,
     f64::consts::TAU
