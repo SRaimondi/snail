@@ -64,6 +64,18 @@ macro_rules! generate_vec2 {
                 self.x.approx_eq(other.x) && self.y.approx_eq(other.y)
             }
 
+            /// Check if each component is less than the other.
+            #[inline(always)]
+            pub fn lt(self, other: Self) -> bool {
+                self.x < other.x && self.y < other.y
+            }
+
+            /// Check if each component is larger than the other.
+            #[inline(always)]
+            pub fn gt(self, other: Self) -> bool {
+                self.x > other.x && self.y > other.y
+            }
+
             /// Compute minimum value for each component.
             #[inline(always)]
             pub fn min(self, rhs: Self) -> Self {

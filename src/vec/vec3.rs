@@ -73,6 +73,18 @@ macro_rules! generate_vec3 {
                 self.x.approx_eq(other.x) && self.y.approx_eq(other.y) && self.z.approx_eq(other.z)
             }
 
+            /// Check if each component is less than the other.
+            #[inline(always)]
+            pub fn lt(self, other: Self) -> bool {
+                self.x < other.x && self.y < other.y && self.z < other.z
+            }
+
+            /// Check if each component is larger than the other.
+            #[inline(always)]
+            pub fn gt(self, other: Self) -> bool {
+                self.x > other.x && self.y > other.y && self.z > other.z
+            }
+
             /// Compute minimum value for each component.
             #[inline(always)]
             pub fn min(self, rhs: Self) -> Self {
