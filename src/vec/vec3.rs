@@ -73,6 +73,12 @@ macro_rules! generate_vec3 {
                 self.x.approx_eq(other.x) && self.y.approx_eq(other.y) && self.z.approx_eq(other.z)
             }
 
+            /// Check if both components are approximately zero.
+            #[inline(always)]
+            pub fn approx_zero(self) -> bool {
+                self.x.approx_zero() && self.y.approx_zero() && self.z.approx_zero()
+            }
+
             /// Check if each component is less than the other.
             #[inline(always)]
             pub fn lt(self, other: Self) -> bool {
