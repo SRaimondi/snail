@@ -49,7 +49,7 @@ macro_rules! generate_complex {
 
             /// Compute conjugate.
             #[inline(always)]
-            pub fn conjugate(self) -> Self {
+            pub const fn conjugate(self) -> Self {
                 Self::new(self.real, -self.im)
             }
 
@@ -75,23 +75,25 @@ macro_rules! generate_complex {
             pub fn normalise_fast(&mut self) {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
-                let inv_n = 1.0 / n;
-                self.real *= inv_n;
-                self.im *= inv_n;
+                let recip_n = n.recip();
+                self.real *= recip_n;
+                self.im *= recip_n;
             }
 
-            /// Return a new Complex number with norm 1.
+            /// Returns the complex number after being normalised.
             #[inline(always)]
             pub fn normalised(self) -> Self {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
-                Self::new(self.real / n, self.im / n)
+                self / n
             }
 
+            /// Return the complex number after being normalised, uses multiplication instead of division.
+            #[inline(always)]
             pub fn normalised_fast(self) -> Self {
                 let n = self.norm();
                 debug_assert!(n > 0.0);
-                (1.0 / n) * self
+                n.recip() * self
             }
         }
 
