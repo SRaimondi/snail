@@ -1,5 +1,6 @@
 use crate::ApproxEq;
 use std::{
+    convert::From,
     f32, f64,
     ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign},
 };
@@ -19,14 +20,6 @@ macro_rules! generate_complex {
             #[inline(always)]
             pub const fn new(real: $t, im: $t) -> Self {
                 Self { real, im }
-            }
-
-            /// Convert to polar form with angle in the range [0, tau)
-            #[inline(always)]
-            pub fn to_polar(self) -> $polar_name {
-                let a = self.im.atan2(self.real);
-                let angle = if a < 0.0 { a + $tau } else { a };
-                $polar_name::new(self.norm(), angle)
             }
 
             /// Check for equality with other.
@@ -189,6 +182,14 @@ macro_rules! generate_complex {
             }
         }
 
+        impl From<$polar_name> for $cartesian_name {
+            #[inline(always)]
+            fn from(p: $polar_name) -> Self {
+                let (s, c) = p.angle.sin_cos();
+                $cartesian_name::new(c * p.radius, s * p.radius)
+            }
+        }
+
         /// Polar complex number representation.
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
@@ -201,7 +202,7 @@ macro_rules! generate_complex {
             /// Create polar complex number from the given values.
             #[inline(always)]
             pub fn new(radius: $t, angle: $t) -> Self {
-                debug_assert!(radius >= 0.0);
+                assert!(radius >= 0.0);
                 Self { radius, angle }
             }
 
@@ -231,13 +232,6 @@ macro_rules! generate_complex {
                 let angle = self.angle / n;
                 let period = $tau / n;
                 (Self { radius, angle }, period)
-            }
-
-            /// Create cartesian complex number.
-            #[inline(always)]
-            pub fn to_cartesian(self) -> $cartesian_name {
-                let (s, c) = self.angle.sin_cos();
-                $cartesian_name::new(c * self.radius, s * self.radius)
             }
         }
 
@@ -278,12 +272,29 @@ macro_rules! generate_complex {
             }
         }
 
+        impl Div<$t> for $polar_name {
+            type Output = Self;
+
+            #[inline(always)]
+            fn div(self, rhs: $t) -> Self::Output {
+                Self::Output::new(self.radius / rhs, self.angle)
+            }
+        }
+
         impl Neg for $polar_name {
             type Output = Self;
 
             #[inline(always)]
             fn neg(self) -> Self::Output {
                 Self::Output::new(self.radius, self.angle + $pi)
+            }
+        }
+
+        impl From<$cartesian_name> for $polar_name {
+            #[inline(always)]
+            fn from(c: $cartesian_name) -> Self {
+                let angle = c.im.atan2(c.real);
+                $polar_name::new(c.norm(), if angle < 0.0 { angle + $tau } else { angle })
             }
         }
     };
