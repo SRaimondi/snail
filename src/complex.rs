@@ -28,6 +28,12 @@ macro_rules! generate_complex {
                 self.real.approx_eq(other.real) && self.im.approx_eq(other.im)
             }
 
+            /// Check if all components are approximately zero.
+            #[inline(always)]
+            pub fn approx_zero(self) -> bool {
+                self.real.approx_zero() && self.im.approx_zero()
+            }
+
             /// Compute squared norm.
             #[inline(always)]
             pub fn norm_squared(self) -> $t {
