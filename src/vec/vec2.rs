@@ -58,6 +58,12 @@ macro_rules! generate_vec2 {
                 Self::new(radius * c, radius * s)
             }
 
+            /// Create new vector from the given angle.
+            #[inline(always)]
+            pub fn unit_polar(angle: $t) -> Self {
+                Self::from_polar(1.0, angle)
+            }
+
             /// Check if this vector and other are equal for the default crate tolerance.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
