@@ -49,7 +49,7 @@ macro_rules! generate_complex {
 
             /// Compute conjugate.
             #[inline(always)]
-            pub const fn conjugate(self) -> Self {
+            pub fn conjugate(self) -> Self {
                 Self::new(self.real, -self.im)
             }
 
