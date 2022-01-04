@@ -58,6 +58,17 @@ mod tests {
     }
 
     #[test]
+    fn test_angle_with() {
+        let a = Vec2f32::UNIT_X;
+        let b = Vec2f32::UNIT_Y;
+        assert!(a.angle_with(b).approx_eq(FRAC_PI_2));
+        assert!(a.angle_with(-b).approx_eq(FRAC_PI_2));
+        assert!(a.angle_with(Vec2f32::broadcast(10.0)).approx_eq(FRAC_PI_4));
+        assert!(a.angle_with(Vec2f32::new(-5.0, 5.0)).approx_eq(3.0 * FRAC_PI_4));
+        assert!(a.angle_with(-a).approx_eq(PI));
+    }
+
+    #[test]
     fn test_from_two_vectors() {
         // Rotation between two non parallel vectors
         let v0 = Vec3f32::new(1.0, 0.0, 0.0);

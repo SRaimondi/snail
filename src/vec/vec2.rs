@@ -171,6 +171,14 @@ macro_rules! generate_vec2 {
                 (1.0 - t) * self + t * end
             }
 
+            /// Return angle between self and other in radians.
+            #[inline(always)]
+            pub fn angle_with(self, other: Self) -> $t {
+                let dot = self.dot(other);
+                let norm_prod = self.norm() * other.norm();
+                (dot / norm_prod).clamp(-1.0, 1.0).acos()
+            }
+
             /// Compute dot product.
             #[inline(always)]
             pub fn dot(self, rhs: Self) -> $t {
