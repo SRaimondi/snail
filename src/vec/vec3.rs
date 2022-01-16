@@ -1,7 +1,7 @@
 use crate::ApproxEq;
 use std::{
     convert::From,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Index},
 };
 
 /// Enum used to represent the axes for Vec3.
@@ -372,6 +372,19 @@ macro_rules! generate_vec3 {
                 self.x /= rhs;
                 self.y /= rhs;
                 self.z /= rhs;
+            }
+        }
+
+        impl Index<Axis3> for $name {
+            type Output = $t;
+
+            #[inline(always)]
+            fn index(&self, index: Axis3) -> &Self::Output {
+                match index {
+                    Axis3::X => &self.x,
+                    Axis3::Y => &self.y,
+                    Axis3::Z => &self.z,
+                }
             }
         }
 
