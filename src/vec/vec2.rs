@@ -1,7 +1,7 @@
 use crate::ApproxEq;
 use std::{
     convert::From,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Index, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
 /// Enum used to represent the axes for Vec2.
@@ -340,6 +340,18 @@ macro_rules! generate_vec2 {
             fn div_assign(&mut self, rhs: $t) {
                 self.x /= rhs;
                 self.y /= rhs;
+            }
+        }
+
+        impl Index<Axis2> for $name {
+            type Output = $t;
+
+            #[inline(always)]
+            fn index(&self, index: Axis2) -> &Self::Output {
+                match index {
+                    Axis2::X => &self.x,
+                    Axis2::Y => &self.y,
+                }
             }
         }
 

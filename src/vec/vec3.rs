@@ -1,7 +1,7 @@
 use crate::ApproxEq;
 use std::{
     convert::From,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign, Index},
+    ops::{Add, AddAssign, Div, DivAssign, Index, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
 /// Enum used to represent the axes for Vec3.
