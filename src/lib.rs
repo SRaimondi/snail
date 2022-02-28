@@ -37,7 +37,7 @@ mod tests {
         }
     }
 
-    impl std::default::Default for Pcg32 {
+    impl Default for Pcg32 {
         #[inline]
         fn default() -> Self {
             const PCG32_DEFAULT_STATE: u64 = 0x853c49e6748fea9b;
