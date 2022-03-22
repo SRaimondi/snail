@@ -67,6 +67,12 @@ macro_rules! generate_vec3 {
                 Self::new(r_xz * c_phi, radius * c_theta, r_xz * s_phi)
             }
 
+            /// Create new vector from the given angles with length 1.
+            #[inline(always)]
+            pub fn unit_polar(phi: $t, theta: $t) -> Self {
+                Self::from_polar(1.0, phi, theta)
+            }
+
             /// Check if this vector and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
@@ -93,43 +99,43 @@ macro_rules! generate_vec3 {
 
             /// Compute minimum value for each component.
             #[inline(always)]
-            pub fn min(self, rhs: Self) -> Self {
+            pub fn ewise_min(self, rhs: Self) -> Self {
                 Self::new(self.x.min(rhs.x), self.y.min(rhs.y), self.z.min(rhs.z))
             }
 
             /// Compute maximum value for each component.
             #[inline(always)]
-            pub fn max(self, rhs: Self) -> Self {
+            pub fn ewise_max(self, rhs: Self) -> Self {
                 Self::new(self.x.max(rhs.x), self.y.max(rhs.y), self.z.max(rhs.z))
             }
 
             /// Compute product for each component.
             #[inline(always)]
-            pub fn product(self, rhs: Self) -> Self {
+            pub fn ewise_product(self, rhs: Self) -> Self {
                 Self::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
             }
 
             /// Compute quotient for each component.
             #[inline(always)]
-            pub fn quotient(self, rhs: Self) -> Self {
+            pub fn ewise_quotient(self, rhs: Self) -> Self {
                 Self::new(self.x / rhs.x, self.y / rhs.y, self.z / rhs.z)
             }
 
             /// Compute absolute value for each component.
             #[inline(always)]
-            pub fn abs(self) -> Self {
+            pub fn ewise_abs(self) -> Self {
                 Self::new(self.x.abs(), self.y.abs(), self.z.abs())
             }
 
             /// Compute reciprocal value for each component.
             #[inline(always)]
-            pub fn recip(self) -> Self {
+            pub fn ewise_recip(self) -> Self {
                 Self::new(self.x.recip(), self.y.recip(), self.z.recip())
             }
 
             /// Clamp each value between the given min and max.
             #[inline(always)]
-            pub fn clamp(self, min: $t, max: $t) -> Self {
+            pub fn ewise_clamp(self, min: $t, max: $t) -> Self {
                 Self::new(
                     self.x.clamp(min, max),
                     self.y.clamp(min, max),
@@ -176,7 +182,7 @@ macro_rules! generate_vec3 {
 
             /// Linearly interpolate for each component.
             #[inline(always)]
-            pub fn lerp(self, t: $t, end: Self) -> Self {
+            pub fn ewise_lerp(self, t: $t, end: Self) -> Self {
                 (1.0 - t) * self + t * end
             }
 
@@ -186,6 +192,14 @@ macro_rules! generate_vec3 {
                 let dot = self.dot(other);
                 let norm_prod = self.norm() * other.norm();
                 (dot / norm_prod).clamp(-1.0, 1.0).acos()
+            }
+
+            /// Return angle between self and other in radians, assumes vectors are unit length.
+            #[inline(always)]
+            pub fn unit_angle_with(self, other: Self) -> $t {
+                debug_assert!(self.norm().approx_eq(1.0));
+                debug_assert!(other.norm().approx_eq(1.0));
+                self.dot(other).clamp(-1.0, 1.0).acos()
             }
 
             /// Compute cross product.

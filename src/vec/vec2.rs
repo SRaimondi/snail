@@ -90,43 +90,43 @@ macro_rules! generate_vec2 {
 
             /// Compute minimum value for each component.
             #[inline(always)]
-            pub fn min(self, rhs: Self) -> Self {
+            pub fn ewise_min(self, rhs: Self) -> Self {
                 Self::new(self.x.min(rhs.x), self.y.min(rhs.y))
             }
 
             /// Compute maximum value for each component.
             #[inline(always)]
-            pub fn max(self, rhs: Self) -> Self {
+            pub fn ewise_max(self, rhs: Self) -> Self {
                 Self::new(self.x.max(rhs.x), self.y.max(rhs.y))
             }
 
             /// Compute product for each component.
             #[inline(always)]
-            pub fn product(self, rhs: Self) -> Self {
+            pub fn ewise_product(self, rhs: Self) -> Self {
                 Self::new(self.x * rhs.x, self.y * rhs.y)
             }
 
             /// Compute quotient for each component.
             #[inline(always)]
-            pub fn quotient(self, rhs: Self) -> Self {
+            pub fn ewise_quotient(self, rhs: Self) -> Self {
                 Self::new(self.x / rhs.x, self.y / rhs.y)
             }
 
             /// Compute absolute value for each component.
             #[inline(always)]
-            pub fn abs(self) -> Self {
+            pub fn ewise_abs(self) -> Self {
                 Self::new(self.x.abs(), self.y.abs())
             }
 
             /// Compute reciprocal value for each component.
             #[inline(always)]
-            pub fn recip(self) -> Self {
+            pub fn ewise_recip(self) -> Self {
                 Self::new(self.x.recip(), self.y.recip())
             }
 
             /// Clamp each value between the given min and max.
             #[inline(always)]
-            pub fn clamp(self, min: $t, max: $t) -> Self {
+            pub fn ewise_clamp(self, min: $t, max: $t) -> Self {
                 Self::new(self.x.clamp(min, max), self.y.clamp(min, max))
             }
 
@@ -167,7 +167,7 @@ macro_rules! generate_vec2 {
 
             /// Linearly interpolate for each component.
             #[inline(always)]
-            pub fn lerp(self, t: $t, end: Self) -> Self {
+            pub fn ewise_lerp(self, t: $t, end: Self) -> Self {
                 (1.0 - t) * self + t * end
             }
 
@@ -177,6 +177,14 @@ macro_rules! generate_vec2 {
                 let dot = self.dot(other);
                 let norm_prod = self.norm() * other.norm();
                 (dot / norm_prod).clamp(-1.0, 1.0).acos()
+            }
+
+            /// Return angle between self and other in radians, assumes vectors are unit length.
+            #[inline(always)]
+            pub fn unit_angle_with(self, other: Self) -> $t {
+                debug_assert!(self.norm().approx_eq(1.0));
+                debug_assert!(other.norm().approx_eq(1.0));
+                self.dot(other).clamp(-1.0, 1.0).acos()
             }
 
             /// Compute dot product.
