@@ -91,10 +91,22 @@ macro_rules! generate_vec3 {
                 self.x < other.x && self.y < other.y && self.z < other.z
             }
 
+            /// Check if each component is less or equal then the other.
+            #[inline(always)]
+            pub fn le(self, other: Self) -> bool {
+                self.x <= other.x && self.y <= other.y && self.z <= other.z
+            }
+
             /// Check if each component is larger than the other.
             #[inline(always)]
             pub fn gt(self, other: Self) -> bool {
                 self.x > other.x && self.y > other.y && self.z > other.z
+            }
+
+            /// Check if each component is greater or equal then the other.
+            #[inline(always)]
+            pub fn ge(self, other: Self) -> bool {
+                self.x >= other.x && self.y >= other.y && self.z >= other.z
             }
 
             /// Compute minimum value for each component.

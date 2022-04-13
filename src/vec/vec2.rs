@@ -82,10 +82,22 @@ macro_rules! generate_vec2 {
                 self.x < other.x && self.y < other.y
             }
 
+            /// Check if each component is less or equal then the other.
+            #[inline(always)]
+            pub fn le(self, other: Self) -> bool {
+                self.x <= other.x && self.y <= other.y
+            }
+
             /// Check if each component is larger than the other.
             #[inline(always)]
             pub fn gt(self, other: Self) -> bool {
                 self.x > other.x && self.y > other.y
+            }
+
+            /// Check if each component is larger or equal then the other.
+            #[inline(always)]
+            pub fn ge(self, other: Self) -> bool {
+                self.x >= other.x && self.y >= other.y
             }
 
             /// Compute minimum value for each component.
