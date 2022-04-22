@@ -4,22 +4,39 @@ pub use vec3::*;
 pub mod vec2;
 pub mod vec3;
 
-pub type Vector2U8 = Vector2<u8>;
-pub type Vector2U16 = Vector2<u16>;
-pub type Vector2U32 = Vector2<u32>;
-pub type Vector2U64 = Vector2<u64>;
-pub type Vector2U128 = Vector2<u128>;
-pub type Vector2USize = Vector2<usize>;
+pub type Vec2u8 = Vector2<u8>;
+pub type Vec2u16 = Vector2<u16>;
+pub type Vec2u32 = Vector2<u32>;
+pub type Vec2u64 = Vector2<u64>;
+pub type Vec2u128 = Vector2<u128>;
+pub type Vec2usize = Vector2<usize>;
 
-pub type Vector2I8 = Vector2<i8>;
-pub type Vector2I16 = Vector2<i16>;
-pub type Vector2I32 = Vector2<i32>;
-pub type Vector2I64 = Vector2<i64>;
-pub type Vector2I128 = Vector2<i128>;
-pub type Vector2ISize = Vector2<isize>;
+pub type Vec2i8 = Vector2<i8>;
+pub type Vec2i16 = Vector2<i16>;
+pub type Vec2i32 = Vector2<i32>;
+pub type Vec2i64 = Vector2<i64>;
+pub type Vec2i128 = Vector2<i128>;
+pub type Vec2iSize = Vector2<isize>;
 
-pub type Vector2F32 = Vector2<f32>;
-pub type Vector2F64 = Vector2<f64>;
+pub type Vec2f32 = Vector2<f32>;
+pub type Vec2f64 = Vector2<f64>;
+
+pub type Vec3u8 = Vector3<u8>;
+pub type Vec3u16 = Vector3<u16>;
+pub type Vec3u32 = Vector3<u32>;
+pub type Vec3u64 = Vector3<u64>;
+pub type Vec3u128 = Vector3<u128>;
+pub type Vec3usize = Vector3<usize>;
+
+pub type Vec3i8 = Vector3<i8>;
+pub type Vec3i16 = Vector3<i16>;
+pub type Vec3i32 = Vector3<i32>;
+pub type Vec3i64 = Vector3<i64>;
+pub type Vec3i128 = Vector3<i128>;
+pub type Vec3iSize = Vector3<isize>;
+
+pub type Vec3f32 = Vector3<f32>;
+pub type Vec3f64 = Vector3<f64>;
 
 pub trait Zero {
     fn zero() -> Self;

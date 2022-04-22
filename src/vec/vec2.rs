@@ -24,12 +24,12 @@ impl Axis2 {
 
 /// Helper class representing boolean operations on vector
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
-pub struct BoolVector2 {
+pub struct Vec2Bool {
     pub x: bool,
     pub y: bool,
 }
 
-impl BoolVector2 {
+impl Vec2Bool {
     #[inline]
     fn new(x: bool, y: bool) -> Self {
         Self { x, y }
@@ -47,6 +47,7 @@ impl BoolVector2 {
 }
 
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+#[repr(C)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
@@ -54,7 +55,7 @@ pub struct Vector2<T> {
 
 impl<T> Vector2<T> {
     #[inline]
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
@@ -92,23 +93,23 @@ where
     T: PartialOrd,
 {
     #[inline]
-    pub fn ewise_lt(self, other: Self) -> BoolVector2 {
-        BoolVector2::new(self.x < other.x, self.y < other.y)
+    pub fn ewise_lt(self, other: Self) -> Vec2Bool {
+        Vec2Bool::new(self.x < other.x, self.y < other.y)
     }
 
     #[inline]
-    pub fn ewise_le(self, other: Self) -> BoolVector2 {
-        BoolVector2::new(self.x <= other.x, self.y <= other.y)
+    pub fn ewise_le(self, other: Self) -> Vec2Bool {
+        Vec2Bool::new(self.x <= other.x, self.y <= other.y)
     }
 
     #[inline]
-    pub fn ewise_gt(self, other: Self) -> BoolVector2 {
-        BoolVector2::new(self.x > other.x, self.y > other.y)
+    pub fn ewise_gt(self, other: Self) -> Vec2Bool {
+        Vec2Bool::new(self.x > other.x, self.y > other.y)
     }
 
     #[inline]
-    pub fn ewise_ge(self, other: Self) -> BoolVector2 {
-        BoolVector2::new(self.x >= other.x, self.y >= other.y)
+    pub fn ewise_ge(self, other: Self) -> Vec2Bool {
+        Vec2Bool::new(self.x >= other.x, self.y >= other.y)
     }
 
     #[inline]
@@ -312,8 +313,8 @@ where
     T: ApproxEq,
 {
     #[inline]
-    pub fn ewise_approx_eq(self, other: Self) -> BoolVector2 {
-        BoolVector2::new(self.x.approx_eq(other.x), self.y.approx_eq(other.y))
+    pub fn ewise_approx_eq(self, other: Self) -> Vec2Bool {
+        Vec2Bool::new(self.x.approx_eq(other.x), self.y.approx_eq(other.y))
     }
 
     #[inline]
@@ -322,8 +323,8 @@ where
     }
 
     #[inline]
-    pub fn ewise_approx_zero(self) -> BoolVector2 {
-        BoolVector2::new(self.x.approx_zero(), self.y.approx_zero())
+    pub fn ewise_approx_zero(self) -> Vec2Bool {
+        Vec2Bool::new(self.x.approx_zero(), self.y.approx_zero())
     }
 
     #[inline]

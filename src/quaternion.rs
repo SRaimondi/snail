@@ -137,19 +137,19 @@ macro_rules! generate_quaternion {
             /// Create rotation around the x axis for the given angle.
             #[inline(always)]
             pub fn x_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_X)
+                Self::from_rotation(angle, $vec_name::unit_x())
             }
 
             /// Create rotation around the y axis for the given angle.
             #[inline(always)]
             pub fn y_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_Y)
+                Self::from_rotation(angle, $vec_name::unit_y())
             }
 
             /// Create rotation around the z axis for the given angle.
             #[inline(always)]
             pub fn z_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_Z)
+                Self::from_rotation(angle, $vec_name::unit_z())
             }
 
             /// Check if it's a unit quaternion.
@@ -318,7 +318,7 @@ macro_rules! generate_quaternion {
     };
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum EulerOrder {
     XYZ,
     YZX,
@@ -329,7 +329,7 @@ pub enum EulerOrder {
 }
 
 impl EulerOrder {
-    #[inline(always)]
+    #[inline]
     fn is_e_positive(self) -> bool {
         match self {
             Self::XYZ | Self::YZX | Self::ZXY => false,
@@ -337,7 +337,7 @@ impl EulerOrder {
         }
     }
 
-    #[inline(always)]
+    #[inline]
     fn permutation(self) -> [Axis3; 3] {
         match self {
             Self::XYZ => [Axis3::X, Axis3::Y, Axis3::Z],
