@@ -1,6 +1,7 @@
 use crate::{ApproxEq, Axis3, Vec3f32, Vec3f64};
 use std::{
     convert::Into,
+    f32, f64,
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
@@ -239,18 +240,18 @@ macro_rules! generate_quaternion {
                 // Naming
                 let p0 = self.scalar;
                 let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
-                // Compute e for sign swap
-                let e = if order.is_e_positive() { 1.0 } else { -1.0 };
 
                 // Test if we are at a singularity
-                let s_test = p0 * p2 + e * p1 * p3;
+                let s_test = p0 * p2 + order.mul_by_e(p1 * p3);
                 if s_test.abs() > 0.5 - <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
                     $euler_name::Singularity(2.0 * p1.atan2(p0), $pi_2.copysign(s_test))
                 } else {
                     $euler_name::Normal(
-                        (2.0 * (p0 * p1 - e * p2 * p3)).atan2(1.0 - 2.0 * (p1 * p1 + p2 * p2)),
+                        (2.0 * (p0 * p1 - order.mul_by_e(p2 * p3)))
+                            .atan2(1.0 - 2.0 * (p1 * p1 + p2 * p2)),
                         (2.0 * s_test).asin(),
-                        (2.0 * (p0 * p3 - e * p1 * p2)).atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
+                        (2.0 * (p0 * p3 - order.mul_by_e(p1 * p2)))
+                            .atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
                     )
                 }
             }
@@ -318,6 +319,7 @@ macro_rules! generate_quaternion {
     };
 }
 
+/// Enum representing the decomposition order from a quaternion to Euler angles.
 #[derive(Copy, Clone)]
 pub enum EulerOrder {
     XYZ,
@@ -329,14 +331,19 @@ pub enum EulerOrder {
 }
 
 impl EulerOrder {
+    /// Multiply the given value by e, used in quaternion to euler conversion.
     #[inline(always)]
-    fn is_e_positive(self) -> bool {
+    fn mul_by_e<T>(self, val: T) -> T
+    where
+        T: Neg<Output = T>,
+    {
         match self {
-            Self::XYZ | Self::YZX | Self::ZXY => false,
-            Self::ZYX | Self::XZY | Self::YXZ => true,
+            Self::ZYX | Self::XZY | Self::YXZ => val,
+            Self::XYZ | Self::YZX | Self::ZXY => -val,
         }
     }
 
+    /// Return the axis permutation for the quaternion depending on the Euler decomposition order.
     #[inline(always)]
     fn permutation(self) -> [Axis3; 3] {
         match self {
@@ -355,12 +362,12 @@ generate_quaternion!(
     EulerDecompositionf32,
     Vec3f32,
     f32,
-    std::f32::consts::FRAC_PI_2
+    f32::consts::FRAC_PI_2
 );
 generate_quaternion!(
     Quaternionf64,
     EulerDecompositionf64,
     Vec3f64,
     f64,
-    std::f64::consts::FRAC_PI_2
+    f64::consts::FRAC_PI_2
 );
