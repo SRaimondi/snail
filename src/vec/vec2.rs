@@ -344,6 +344,9 @@ where
     }
 
     /// Compute angle with the other vector assuming they are both normalised.
+    /// # Safety
+    /// The function expects both the vector to norm one, using vectors that don't have unit
+    /// length will produce incorrect results.
     #[inline(always)]
     pub unsafe fn unit_angle_with(self, other: Self) -> T {
         self.dot(other).clamp(-T::ONE, T::ONE).acos()
