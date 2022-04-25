@@ -132,25 +132,25 @@ macro_rules! generate_quaternion {
             /// Check if this quaternion and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
-                self.scalar.approx_eq(other.scalar) && self.complex.approx_eq(other.complex).all()
+                self.scalar.approx_eq(other.scalar) && self.complex.approx_eq(other.complex)
             }
 
             /// Create rotation around the x axis for the given angle.
             #[inline(always)]
             pub fn x_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_X)
+                Self::from_rotation(angle, $vec_name::unit_x())
             }
 
             /// Create rotation around the y axis for the given angle.
             #[inline(always)]
             pub fn y_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_Y)
+                Self::from_rotation(angle, $vec_name::unit_y())
             }
 
             /// Create rotation around the z axis for the given angle.
             #[inline(always)]
             pub fn z_rotation(angle: $t) -> Self {
-                Self::from_rotation(angle, $vec_name::UNIT_Z)
+                Self::from_rotation(angle, $vec_name::unit_z())
             }
 
             /// Check if it's a unit quaternion.
