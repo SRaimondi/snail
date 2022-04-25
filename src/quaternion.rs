@@ -132,7 +132,7 @@ macro_rules! generate_quaternion {
             /// Check if this quaternion and other are approximate equal.
             #[inline(always)]
             pub fn approx_eq(self, other: Self) -> bool {
-                self.scalar.approx_eq(other.scalar) && self.complex.approx_eq(other.complex)
+                self.scalar.approx_eq(other.scalar) && self.complex.approx_eq(other.complex).all()
             }
 
             /// Create rotation around the x axis for the given angle.

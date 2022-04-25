@@ -77,20 +77,20 @@ mod tests {
         let v1 = Vec3f32::new(0.0, 1.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
         let v = q.rotate(v0);
-        assert!(v.approx_eq(v1));
+        assert!(v.approx_eq(v1).all());
 
         // Rotation between the same vector
         let v0 = Vec3f32::new(1.0, 0.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v0);
         let v = q.rotate(v0);
-        assert!(v.approx_eq(v0));
+        assert!(v.approx_eq(v0).all());
 
         // Rotation between opposite vectors
         let v0 = Vec3f32::new(1.0, 0.0, 0.0);
         let v1 = Vec3f32::new(-1.0, 0.0, 0.0);
         let q = Quaternionf32::from_two_vectors_normalised(v0, v1);
         let v = q.rotate(v0);
-        v.approx_eq(v1);
+        assert!(v.approx_eq(v1).all());
     }
 
     #[test]
@@ -100,36 +100,45 @@ mod tests {
 
         assert!(Quaternionf32::x_rotation(FRAC_PI_4)
             .rotate(Vec3f32::UNIT_Y)
-            .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),);
+            .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised())
+            .all());
         assert!(Quaternionf32::x_rotation(-FRAC_PI_4)
             .rotate(Vec3f32::UNIT_Y)
-            .approx_eq(Vec3f32::new(0.0, 1.0, -1.0).normalised()));
+            .approx_eq(Vec3f32::new(0.0, 1.0, -1.0).normalised())
+            .all());
         assert!(Quaternionf32::x_rotation(PI)
             .rotate(Vec3f32::UNIT_Y)
-            .approx_eq(-Vec3f32::UNIT_Y));
+            .approx_eq(-Vec3f32::UNIT_Y)
+            .all());
 
         let v = Vec3f32::broadcast(1.0).normalised();
         assert!(Quaternionf32::y_rotation(PI)
             .rotate(v)
-            .approx_eq(Vec3f32::new(-1.0, 1.0, -1.0).normalised()),);
+            .approx_eq(Vec3f32::new(-1.0, 1.0, -1.0).normalised())
+            .all());
         assert!(Quaternionf32::z_rotation(FRAC_PI_2)
             .rotate(v)
-            .approx_eq(Vec3f32::new(-1.0, 1.0, 1.0).normalised()),);
+            .approx_eq(Vec3f32::new(-1.0, 1.0, 1.0).normalised())
+            .all());
         assert!(Quaternionf32::z_rotation(-FRAC_PI_2)
             .rotate(v)
-            .approx_eq(Vec3f32::new(1.0, -1.0, 1.0).normalised()),);
+            .approx_eq(Vec3f32::new(1.0, -1.0, 1.0).normalised())
+            .all());
         assert!(Quaternionf32::z_rotation(PI)
             .rotate(v)
-            .approx_eq(Vec3f32::new(-1.0, -1.0, 1.0).normalised()),);
+            .approx_eq(Vec3f32::new(-1.0, -1.0, 1.0).normalised())
+            .all());
         assert!(
             (Quaternionf32::x_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(FRAC_PI_2))
                 .rotate(Vec3f32::UNIT_X)
-                .approx_eq(Vec3f32::UNIT_Y),
+                .approx_eq(Vec3f32::UNIT_Y)
+                .all()
         );
         assert!(
             (Quaternionf32::z_rotation(FRAC_PI_2) * Quaternionf32::y_rotation(-FRAC_PI_4))
                 .rotate(Vec3f32::UNIT_X)
-                .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised()),
+                .approx_eq(Vec3f32::new(0.0, 1.0, 1.0).normalised())
+                .all()
         );
     }
 
@@ -306,9 +315,9 @@ mod tests {
                 let t = s.cross(n);
                 let q = Quaternionf32::from_frame(s, n, t);
                 // Check we get the original axes
-                assert!(q.rotate(Vec3f32::UNIT_X).approx_eq(s));
-                assert!(q.rotate(Vec3f32::UNIT_Y).approx_eq(n));
-                assert!(q.rotate(Vec3f32::UNIT_Z).approx_eq(t));
+                assert!(q.rotate(Vec3f32::UNIT_X).approx_eq(s).all());
+                assert!(q.rotate(Vec3f32::UNIT_Y).approx_eq(n).all());
+                assert!(q.rotate(Vec3f32::UNIT_Z).approx_eq(t).all());
             }
         }
     }

@@ -24,6 +24,35 @@ impl Axis3 {
     }
 }
 
+/// Boolean vector used in element wise logical operations.
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+#[repr(C)]
+pub struct Vec3bool {
+    pub x: bool,
+    pub y: bool,
+    pub z: bool,
+}
+
+impl Vec3bool {
+    /// Create new boolean vector.
+    #[inline(always)]
+    pub fn new(x: bool, y: bool, z: bool) -> Self {
+        Self { x, y, z }
+    }
+
+    /// Check if all elements are true.
+    #[inline(always)]
+    pub fn all(self) -> bool {
+        self.x && self.y && self.z
+    }
+
+    /// Check if any element is true.
+    #[inline(always)]
+    pub fn any(self) -> bool {
+        self.x || self.y || self.z
+    }
+}
+
 macro_rules! generate_vec3 {
     ($name:ident, $t:ty) => {
         #[derive(Copy, Clone, Debug, Default)]
@@ -73,40 +102,48 @@ macro_rules! generate_vec3 {
                 Self::from_polar(1.0, phi, theta)
             }
 
-            /// Check if this vector and other are approximate equal.
+            /// Check if this vector and other are equal for the default crate tolerance.
             #[inline(always)]
-            pub fn approx_eq(self, other: Self) -> bool {
-                self.x.approx_eq(other.x) && self.y.approx_eq(other.y) && self.z.approx_eq(other.z)
+            pub fn approx_eq(self, other: Self) -> Vec3bool {
+                Vec3bool::new(
+                    self.x.approx_eq(other.x),
+                    self.y.approx_eq(other.y),
+                    self.z.approx_eq(other.z),
+                )
             }
 
-            /// Check if both components are approximately zero.
+            /// Check if components are approximately zero.
             #[inline(always)]
-            pub fn approx_zero(self) -> bool {
-                self.x.approx_zero() && self.y.approx_zero() && self.z.approx_zero()
+            pub fn approx_zero(self) -> Vec3bool {
+                Vec3bool::new(
+                    self.x.approx_zero(),
+                    self.y.approx_zero(),
+                    self.z.approx_zero(),
+                )
             }
 
             /// Check if each component is less than the other.
             #[inline(always)]
-            pub fn lt(self, other: Self) -> bool {
-                self.x < other.x && self.y < other.y && self.z < other.z
+            pub fn lt(self, other: Self) -> Vec3bool {
+                Vec3bool::new(self.x < other.x, self.y < other.y, self.z < other.z)
             }
 
             /// Check if each component is less or equal then the other.
             #[inline(always)]
-            pub fn le(self, other: Self) -> bool {
-                self.x <= other.x && self.y <= other.y && self.z <= other.z
+            pub fn le(self, other: Self) -> Vec3bool {
+                Vec3bool::new(self.x <= other.x, self.y <= other.y, self.z <= other.z)
             }
 
             /// Check if each component is larger than the other.
             #[inline(always)]
-            pub fn gt(self, other: Self) -> bool {
-                self.x > other.x && self.y > other.y && self.z > other.z
+            pub fn gt(self, other: Self) -> Vec3bool {
+                Vec3bool::new(self.x > other.x, self.y > other.y, self.z > other.z)
             }
 
             /// Check if each component is greater or equal then the other.
             #[inline(always)]
-            pub fn ge(self, other: Self) -> bool {
-                self.x >= other.x && self.y >= other.y && self.z >= other.z
+            pub fn ge(self, other: Self) -> Vec3bool {
+                Vec3bool::new(self.x >= other.x, self.y >= other.y, self.z >= other.z)
             }
 
             /// Compute minimum value for each component.

@@ -22,6 +22,34 @@ impl Axis2 {
     }
 }
 
+/// Boolean vector used in element wise logical operations.
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+#[repr(C)]
+pub struct Vec2bool {
+    pub x: bool,
+    pub y: bool,
+}
+
+impl Vec2bool {
+    /// Create new boolean vector.
+    #[inline(always)]
+    pub fn new(x: bool, y: bool) -> Self {
+        Self { x, y }
+    }
+
+    /// Check if all elements are true.
+    #[inline(always)]
+    pub fn all(self) -> bool {
+        self.x && self.y
+    }
+
+    /// Check if any element is true.
+    #[inline(always)]
+    pub fn any(self) -> bool {
+        self.x || self.y
+    }
+}
+
 macro_rules! generate_vec2 {
     ($name:ident, $t:ty) => {
         #[derive(Copy, Clone, Debug, Default)]
@@ -66,38 +94,38 @@ macro_rules! generate_vec2 {
 
             /// Check if this vector and other are equal for the default crate tolerance.
             #[inline(always)]
-            pub fn approx_eq(self, other: Self) -> bool {
-                self.x.approx_eq(other.x) && self.y.approx_eq(other.y)
+            pub fn approx_eq(self, other: Self) -> Vec2bool {
+                Vec2bool::new(self.x.approx_eq(other.x), self.y.approx_eq(other.y))
             }
 
-            /// Check if both components are approximately zero.
+            /// Check if components are approximately zero.
             #[inline(always)]
-            pub fn approx_zero(self) -> bool {
-                self.x.approx_zero() && self.y.approx_zero()
+            pub fn approx_zero(self) -> Vec2bool {
+                Vec2bool::new(self.x.approx_zero(), self.y.approx_zero())
             }
 
             /// Check if each component is less than the other.
             #[inline(always)]
-            pub fn lt(self, other: Self) -> bool {
-                self.x < other.x && self.y < other.y
+            pub fn lt(self, other: Self) -> Vec2bool {
+                Vec2bool::new(self.x < other.x, self.y < other.y)
             }
 
             /// Check if each component is less or equal then the other.
             #[inline(always)]
-            pub fn le(self, other: Self) -> bool {
-                self.x <= other.x && self.y <= other.y
+            pub fn le(self, other: Self) -> Vec2bool {
+                Vec2bool::new(self.x <= other.x, self.y <= other.y)
             }
 
             /// Check if each component is larger than the other.
             #[inline(always)]
-            pub fn gt(self, other: Self) -> bool {
-                self.x > other.x && self.y > other.y
+            pub fn gt(self, other: Self) -> Vec2bool {
+                Vec2bool::new(self.x > other.x, self.y > other.y)
             }
 
             /// Check if each component is larger or equal then the other.
             #[inline(always)]
-            pub fn ge(self, other: Self) -> bool {
-                self.x >= other.x && self.y >= other.y
+            pub fn ge(self, other: Self) -> Vec2bool {
+                Vec2bool::new(self.x >= other.x, self.y >= other.y)
             }
 
             /// Compute minimum value for each component.
