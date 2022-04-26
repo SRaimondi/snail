@@ -334,6 +334,38 @@ where
         Self::new(self.x.recip(), self.y.recip(), self.z.recip())
     }
 
+    /// Compute element wise minimum.
+    #[inline(always)]
+    pub fn ewise_min(self, other: Self) -> Self {
+        Self::new(
+            self.x.min(other.x),
+            self.y.min(other.y),
+            self.z.min(other.z),
+        )
+    }
+
+    /// Compute element wise maximum.
+    #[inline(always)]
+    pub fn ewise_max(self, other: Self) -> Self {
+        Self::new(
+            self.x.max(other.x),
+            self.y.max(other.y),
+            self.z.max(other.z),
+        )
+    }
+
+    /// Return the smallest value.
+    #[inline(always)]
+    pub fn min_element(self) -> T {
+        self.x.min(self.y).min(self.z)
+    }
+
+    /// Return the largest value.
+    #[inline(always)]
+    pub fn max_element(self) -> T {
+        self.x.max(self.y).max(self.z)
+    }
+
     /// Return a new vector after normalising.
     #[inline(always)]
     pub fn normalised(self) -> Self {
