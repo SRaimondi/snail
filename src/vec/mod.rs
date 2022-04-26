@@ -122,6 +122,79 @@ impl_abs!(i128);
 impl_abs!(f32);
 impl_abs!(f64);
 
+/// Trait used for types that implement min, max.
+pub trait MinMax {
+    fn min(self, other: Self) -> Self;
+    fn max(self, other: Self) -> Self;
+}
+
+pub trait Clamp {
+    fn clamp(self, min: Self, max: Self) -> Self;
+}
+
+macro_rules! impl_min_max_clamp_ord {
+    ($t:ty) => {
+        impl MinMax for $t {
+            #[inline(always)]
+            fn min(self, other: Self) -> Self {
+                Ord::min(self, other)
+            }
+
+            #[inline(always)]
+            fn max(self, other: Self) -> Self {
+                Ord::max(self, other)
+            }
+        }
+
+        impl Clamp for $t {
+            #[inline(always)]
+            fn clamp(self, min: Self, max: Self) -> Self {
+                Ord::clamp(self, min, max)
+            }
+        }
+    };
+}
+
+impl_min_max_clamp_ord!(u8);
+impl_min_max_clamp_ord!(u16);
+impl_min_max_clamp_ord!(u32);
+impl_min_max_clamp_ord!(u64);
+impl_min_max_clamp_ord!(u128);
+impl_min_max_clamp_ord!(usize);
+
+impl_min_max_clamp_ord!(i8);
+impl_min_max_clamp_ord!(i16);
+impl_min_max_clamp_ord!(i32);
+impl_min_max_clamp_ord!(i64);
+impl_min_max_clamp_ord!(i128);
+impl_min_max_clamp_ord!(isize);
+
+macro_rules! impl_min_max_clamp_float {
+    ($t:ty) => {
+        impl MinMax for $t {
+            #[inline(always)]
+            fn min(self, other: Self) -> Self {
+                self.min(other)
+            }
+
+            #[inline(always)]
+            fn max(self, other: Self) -> Self {
+                self.max(other)
+            }
+        }
+
+        impl Clamp for $t {
+            #[inline(always)]
+            fn clamp(self, min: Self, max: Self) -> Self {
+                self.clamp(min, max)
+            }
+        }
+    };
+}
+
+impl_min_max_clamp_float!(f32);
+impl_min_max_clamp_float!(f64);
+
 use std::ops::{Add, Div, DivAssign, Mul, MulAssign, Neg, Sub};
 
 /// Trait used for types that can do floating point operations (f32 and f64).
