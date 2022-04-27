@@ -36,19 +36,19 @@ pub struct Vec3bool {
 impl Vec3bool {
     /// Create new boolean vector from the given values.
     #[inline(always)]
-    fn new(x: bool, y: bool, z: bool) -> Self {
+    const fn new(x: bool, y: bool, z: bool) -> Self {
         Self { x, y, z }
     }
 
     /// Check if all elements are true.
     #[inline(always)]
-    pub fn all(self) -> bool {
+    pub const fn all(self) -> bool {
         self.x && self.y && self.z
     }
 
     /// Check if any element is true.
     #[inline(always)]
-    pub fn any(self) -> bool {
+    pub const fn any(self) -> bool {
         self.x || self.y || self.z
     }
 }

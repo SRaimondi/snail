@@ -33,19 +33,19 @@ pub struct Vec2bool {
 impl Vec2bool {
     /// Create new boolean vector from the given values.
     #[inline(always)]
-    fn new(x: bool, y: bool) -> Self {
+    const fn new(x: bool, y: bool) -> Self {
         Self { x, y }
     }
 
     /// Check if all elements are true.
     #[inline(always)]
-    pub fn all(self) -> bool {
+    pub const fn all(self) -> bool {
         self.x && self.y
     }
 
     /// Check if any element is true.
     #[inline(always)]
-    pub fn any(self) -> bool {
+    pub const fn any(self) -> bool {
         self.x || self.y
     }
 }
