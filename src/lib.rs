@@ -11,43 +11,11 @@ pub mod vec;
 #[cfg(test)]
 mod tests {
     use super::*;
+
     use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI, TAU};
 
-    #[derive(Copy, Clone)]
-    pub struct Pcg32 {
-        state: u64,
-        stream: u64,
-    }
+    use pcg32::Pcg32;
 
-    impl Pcg32 {
-        fn next_u32(&mut self) -> u32 {
-            const PCG32_MULTIPLIER: u64 = 0x5851f42d4c957f2d;
-            let old_state = self.state;
-            self.state = old_state
-                .wrapping_mul(PCG32_MULTIPLIER)
-                .wrapping_add(self.stream);
-            let xor_shifted = (((old_state >> 18u64) ^ old_state) >> 27u64) as u32;
-            let rot = (old_state >> 59u64) as u32;
-            (xor_shifted >> rot) | (xor_shifted << ((!rot).wrapping_add(1u32) & 31u32))
-        }
-
-        fn next_f32(&mut self) -> f32 {
-            let u = (self.next_u32() >> 9u32) | 0x3f800000u32;
-            f32::from_bits(u) - 1.0
-        }
-    }
-
-    impl Default for Pcg32 {
-        #[inline]
-        fn default() -> Self {
-            const PCG32_DEFAULT_STATE: u64 = 0x853c49e6748fea9b;
-            const PCG32_DEFAULT_STREAM: u64 = 0xda3e39cb94b95bdb;
-            Self {
-                state: PCG32_DEFAULT_STATE,
-                stream: PCG32_DEFAULT_STREAM,
-            }
-        }
-    }
 
     fn sample_sphere(rng: &mut Pcg32) -> Vec3f32 {
         let y = 1.0 - 2.0 * rng.next_f32();
