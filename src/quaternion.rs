@@ -73,14 +73,15 @@ macro_rules! generate_quaternion {
                 debug_assert!(to.norm().approx_eq(1.0));
 
                 let c = from.dot(to);
-                if c < -1.0 + <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
+                let q = if c < -1.0 + <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
                     Self::from_vector(from.compute_perpendicular())
                 } else {
                     let axis = from.cross(to);
                     let s = (2.0 * (1.0 + c)).sqrt();
                     let inv_s = 1.0 / s;
                     Self::new(0.5 * s, inv_s * axis)
-                }
+                };
+                q.normalised()
             }
 
             /// Create quaternion as rotation between two vectors.
