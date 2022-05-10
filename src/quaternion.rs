@@ -5,15 +5,7 @@ use std::{
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $vec_name:ident, $euler_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
-        /// Helper struct storing the Euler decomposition angles.
-        #[derive(Copy, Clone, Debug, Default)]
-        pub struct $euler_name {
-            pub z_angle: $t,
-            pub y_angle: $t,
-            pub x_angle: $t,
-        }
-
+    ($name:ident, $vec_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
         /// q = q_scalar + complex.x * i + complex.y * j + complex.z * k.
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
@@ -221,7 +213,7 @@ macro_rules! generate_quaternion {
 
             /// Extract euler angles for the classical rotation order ZYX.
             #[inline]
-            pub fn extract_euler_zyx(self) -> $euler_name {
+            pub fn extract_euler_zyx(self) -> ($t, $t, $t) {
                 debug_assert!(self.is_unit());
 
                 // Tolerances used in the computation
@@ -243,11 +235,8 @@ macro_rules! generate_quaternion {
                         (2.0 * qa * qb + 2.0 * qc * qd).atan2(2.0 * qa * qa - 1.0 + 2.0 * qd * qd)
                     )
                 };
-                $euler_name {
-                    z_angle: -a,
-                    y_angle: -b,
-                    x_angle: -c,
-                }
+
+                (-a, -b, -c)
             }
 
             /// Compute a quaternion q such that q * self = target.
@@ -316,7 +305,6 @@ macro_rules! generate_quaternion {
 generate_quaternion!(
     Quaternionf32,
     Vec3f32,
-    EulerDecompositionf32,
     f32,
     f32::consts::FRAC_PI_2,
     f32::EPSILON
@@ -324,7 +312,6 @@ generate_quaternion!(
 generate_quaternion!(
     Quaternionf64,
     Vec3f64,
-        EulerDecompositionf64,
     f64,
     f64::consts::FRAC_PI_2,
     f64::EPSILON

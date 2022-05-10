@@ -104,9 +104,9 @@ mod tests {
     fn test_euler() {
         let q = Quaternionf32::from_rotation(PI / 10.0, Vec3f32::new(1.0, 0.0, 1.0).normalised());
         let euler = q.extract_euler_zyx();
-        assert!(euler.z_angle.approx_eq(0.22035267));
-        assert!(euler.y_angle.approx_eq(0.02447425));
-        assert!(euler.x_angle.approx_eq(0.22035267));
+        assert!(euler.0.approx_eq(0.22035267));
+        assert!(euler.1.approx_eq(0.02447425));
+        assert!(euler.2.approx_eq(0.22035267));
     }
 
     #[test]
