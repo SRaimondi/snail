@@ -50,6 +50,18 @@ impl Vec2bool {
     }
 }
 
+impl Index<Axis2> for Vec2bool {
+    type Output = bool;
+
+    #[inline(always)]
+    fn index(&self, axis: Axis2) -> &Self::Output {
+        match axis {
+            Axis2::X => &self.x,
+            Axis2::Y => &self.y,
+        }
+    }
+}
+
 /// Generic vector in 2D.
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 #[repr(C)]

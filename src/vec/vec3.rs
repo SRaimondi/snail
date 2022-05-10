@@ -53,6 +53,19 @@ impl Vec3bool {
     }
 }
 
+impl Index<Axis3> for Vec3bool {
+    type Output = bool;
+
+    #[inline(always)]
+    fn index(&self, axis: Axis3) -> &Self::Output {
+        match axis {
+            Axis3::X => &self.x,
+            Axis3::Y => &self.y,
+            Axis3::Z => &self.z,
+        }
+    }
+}
+
 /// Generic vector in 3D.
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 #[repr(C)]
