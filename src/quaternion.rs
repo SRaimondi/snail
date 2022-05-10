@@ -6,6 +6,7 @@ use std::{
 
 macro_rules! generate_quaternion {
     ($name:ident, $vec_name:ident, $euler_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
+        /// Helper struct storing the Euler decomposition angles.
         #[derive(Copy, Clone, Debug, Default)]
         pub struct $euler_name {
             pub z_angle: $t,
@@ -315,6 +316,7 @@ macro_rules! generate_quaternion {
 generate_quaternion!(
     Quaternionf32,
     Vec3f32,
+    EulerDecompositionf32,
     f32,
     f32::consts::FRAC_PI_2,
     f32::EPSILON
@@ -322,6 +324,7 @@ generate_quaternion!(
 generate_quaternion!(
     Quaternionf64,
     Vec3f64,
+        EulerDecompositionf64,
     f64,
     f64::consts::FRAC_PI_2,
     f64::EPSILON
