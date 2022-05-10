@@ -1,32 +1,11 @@
-use crate::{ApproxEq, Axis3, Vec3f32, Vec3f64};
+use crate::{ApproxEq, Vec3f32, Vec3f64};
 use std::{
-    convert::Into,
     f32, f64,
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $euler_name:ident, $vec_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
-        /// Enum representing the result of the decomposition in Euler angles.
-        #[derive(Copy, Clone)]
-        pub enum $euler_name {
-            /// All angles are used for the rotation.
-            Normal($t, $t, $t),
-            /// We are at a singularity, the last angle has value 0.
-            Singularity($t, $t),
-        }
-
-        #[allow(clippy::from_over_into)]
-        impl Into<($t, $t, $t)> for $euler_name {
-            #[inline(always)]
-            fn into(self) -> ($t, $t, $t) {
-                match self {
-                    Self::Normal(t0, t1, t2) => (t0, t1, t2),
-                    Self::Singularity(t0, t1) => (t0, t1, 0.0),
-                }
-            }
-        }
-
+    ($name:ident, $vec_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
         /// q = q_scalar + complex.x * i + complex.y * j + complex.z * k.
         #[derive(Copy, Clone, Debug, Default)]
         #[repr(C)]
@@ -232,31 +211,6 @@ macro_rules! generate_quaternion {
                 )
             }
 
-            // /// Extract the Euler angles for the given order from the quaternion.
-            // /// The output angles are ordered the same way rotations should be applied .0, .1 and .2
-            // /// See http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
-            // #[inline]
-            // pub fn extract_euler_angles(self, order: EulerOrder) -> $euler_name {
-            //     debug_assert!(self.is_unit());
-            //     // Naming
-            //     let p0 = self.scalar;
-            //     let (p1, p2, p3) = self.complex.permute_with_array(order.permutation()).into();
-            //
-            //     // Test if we are at a singularity
-            //     let s_test = p0 * p2 + order.mul_by_e(p1 * p3);
-            //     if s_test.abs() > 0.5 - <$t as ApproxEq>::DEFAULT_ABSOLUTE_EPS {
-            //         $euler_name::Singularity(2.0 * p1.atan2(p0), $pi_2.copysign(s_test))
-            //     } else {
-            //         $euler_name::Normal(
-            //             (2.0 * (p0 * p1 - order.mul_by_e(p2 * p3)))
-            //                 .atan2(1.0 - 2.0 * (p1 * p1 + p2 * p2)),
-            //             (2.0 * s_test).asin(),
-            //             (2.0 * (p0 * p3 - order.mul_by_e(p1 * p2)))
-            //                 .atan2(1.0 - 2.0 * (p2 * p2 + p3 * p3)),
-            //         )
-            //     }
-            // }
-
             /// Extract euler angles for the classical rotation order ZYX.
             #[inline]
             pub fn extract_euler_zyx(self) -> ($t, $t, $t) {
@@ -348,47 +302,8 @@ macro_rules! generate_quaternion {
     };
 }
 
-// /// Enum representing the decomposition order from a quaternion to Euler angles.
-// #[derive(Copy, Clone)]
-// pub enum EulerOrder {
-//     XYZ,
-//     YZX,
-//     ZXY,
-//     ZYX,
-//     XZY,
-//     YXZ,
-// }
-
-// impl EulerOrder {
-//     /// Multiply the given value by e, used in quaternion to euler conversion.
-//     #[inline(always)]
-//     fn mul_by_e<T>(self, val: T) -> T
-//     where
-//         T: Neg<Output = T>,
-//     {
-//         match self {
-//             Self::ZYX | Self::XZY | Self::YXZ => val,
-//             Self::XYZ | Self::YZX | Self::ZXY => -val,
-//         }
-//     }
-//
-//     /// Return the axis permutation for the quaternion depending on the Euler decomposition order.
-//     #[inline(always)]
-//     fn permutation(self) -> [Axis3; 3] {
-//         match self {
-//             Self::XYZ => [Axis3::X, Axis3::Y, Axis3::Z],
-//             Self::YZX => [Axis3::Y, Axis3::Z, Axis3::X],
-//             Self::ZXY => [Axis3::Z, Axis3::X, Axis3::Y],
-//             Self::ZYX => [Axis3::Z, Axis3::Y, Axis3::X],
-//             Self::XZY => [Axis3::X, Axis3::Z, Axis3::Y],
-//             Self::YXZ => [Axis3::Y, Axis3::X, Axis3::Z],
-//         }
-//     }
-// }
-
 generate_quaternion!(
     Quaternionf32,
-    EulerDecompositionf32,
     Vec3f32,
     f32,
     f32::consts::FRAC_PI_2,
@@ -396,7 +311,6 @@ generate_quaternion!(
 );
 generate_quaternion!(
     Quaternionf64,
-    EulerDecompositionf64,
     Vec3f64,
     f64,
     f64::consts::FRAC_PI_2,
