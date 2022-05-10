@@ -6,7 +6,7 @@ use std::{
 };
 
 macro_rules! generate_quaternion {
-    ($name:ident, $euler_name:ident, $vec_name:ident, $t:ty, $pi_2:expr) => {
+    ($name:ident, $euler_name:ident, $vec_name:ident, $t:ty, $pi_2:expr, $eps:expr) => {
         /// Enum representing the result of the decomposition in Euler angles.
         #[derive(Copy, Clone)]
         pub enum $euler_name {
@@ -261,13 +261,28 @@ macro_rules! generate_quaternion {
             #[inline]
             pub fn extract_euler_zyx(self) -> ($t, $t, $t) {
                 debug_assert!(self.is_unit());
-                let q0 = self.scalar;
-                let (q1, q2, q3) = (self.complex.x, self.complex.y, self.complex.z);
-                (
-                    (2.0 * (q0 * q3 + q1 * q2)).atan2(1.0 - 2.0 * (q2 * q2 + q3 * q3)),
-                    (2.0 * (q0 * q2 - q3 * q1)).clamp(-1.0, 1.0).asin(),
-                    (2.0 * (q0 * q1 + q2 * q3)).atan2(1.0 - 2.0 * (q1 * q1 + q2 * q2)),
-                )
+
+                // Tolerances used in the computation
+                const TOL_A: $t = $pi_2 - 10.0 * $eps;
+                const TOL_B: $t = -$pi_2 + 10.0 * $eps;
+
+                let qa = self.scalar;
+                let (qb, qc, qd) = (-self.complex.x, -self.complex.y, -self.complex.z);
+                let tmp = (2.0 * qb * qd - 2.0 * qa * qc).clamp(-1.0, 1.0);
+
+                let b = -tmp.asin();
+                let (a, c) = if b >= TOL_A {
+                    (-2.0 * qb.atan2(qa), 0.0)
+                } else if b <= TOL_B {
+                    (2.0 * qb.atan2(qa), 0.0)
+                } else {
+                    (
+                        (2.0 * qa * qd + 2.0 * qb * qc).atan2(2.0 * qa * qa - 1.0 + 2.0 * qb * qb),
+                        (2.0 * qa * qb + 2.0 * qc * qd).atan2(2.0 * qa * qa - 1.0 + 2.0 * qd * qd)
+                    )
+                };
+
+                (-a, -b, -c)
             }
 
             /// Compute a quaternion q such that q * self = target.
@@ -376,12 +391,14 @@ generate_quaternion!(
     EulerDecompositionf32,
     Vec3f32,
     f32,
-    f32::consts::FRAC_PI_2
+    f32::consts::FRAC_PI_2,
+    f32::EPSILON
 );
 generate_quaternion!(
     Quaternionf64,
     EulerDecompositionf64,
     Vec3f64,
     f64,
-    f64::consts::FRAC_PI_2
+    f64::consts::FRAC_PI_2,
+    f64::EPSILON
 );
