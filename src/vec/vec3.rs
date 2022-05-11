@@ -36,7 +36,7 @@ pub struct Vec3bool {
 impl Vec3bool {
     /// Create new boolean vector from the given values.
     #[inline(always)]
-    const fn new(x: bool, y: bool, z: bool) -> Self {
+    pub const fn new(x: bool, y: bool, z: bool) -> Self {
         Self { x, y, z }
     }
 

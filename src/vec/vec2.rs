@@ -33,7 +33,7 @@ pub struct Vec2bool {
 impl Vec2bool {
     /// Create new boolean vector from the given values.
     #[inline(always)]
-    const fn new(x: bool, y: bool) -> Self {
+    pub const fn new(x: bool, y: bool) -> Self {
         Self { x, y }
     }
 
