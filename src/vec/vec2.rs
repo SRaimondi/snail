@@ -48,6 +48,15 @@ impl Vec2bool {
     pub const fn any(self) -> bool {
         self.x || self.y
     }
+
+    /// Select elements from the two given vectors using the boolean vector as mask.
+    #[inline(always)]
+    pub fn select<T>(a: Vector2<T>, b: Vector2<T>, mask: Self) -> Vector2<T> {
+        Vector2::new(
+            if mask.x { a.x } else { b.x },
+            if mask.y { a.y } else { b.y },
+        )
+    }
 }
 
 impl Index<Axis2> for Vec2bool {

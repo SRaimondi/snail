@@ -51,6 +51,16 @@ impl Vec3bool {
     pub const fn any(self) -> bool {
         self.x || self.y || self.z
     }
+
+    /// Select elements from the two given vectors using the boolean vector as mask.
+    #[inline(always)]
+    pub fn select<T>(a: Vector3<T>, b: Vector3<T>, mask: Self) -> Vector3<T> {
+        Vector3::new(
+            if mask.x { a.x } else { b.x },
+            if mask.y { a.y } else { b.y },
+            if mask.z { a.z } else { b.z },
+        )
+    }
 }
 
 impl Index<Axis3> for Vec3bool {

@@ -235,7 +235,7 @@ macro_rules! generate_quaternion {
                 } else {
                     (
                         (2.0 * qa * qd + 2.0 * qb * qc).atan2(2.0 * qa * qa - 1.0 + 2.0 * qb * qb),
-                        (2.0 * qa * qb + 2.0 * qc * qd).atan2(2.0 * qa * qa - 1.0 + 2.0 * qd * qd)
+                        (2.0 * qa * qb + 2.0 * qc * qd).atan2(2.0 * qa * qa - 1.0 + 2.0 * qd * qd),
                     )
                 };
 
