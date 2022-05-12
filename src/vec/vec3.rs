@@ -270,6 +270,16 @@ where
     pub fn unit_z() -> Self {
         Self::new(T::ZERO, T::ZERO, T::ONE)
     }
+
+    /// Return the unit axis for the given axis.
+    #[inline(always)]
+    pub fn unit_for_axis(axis: Axis3) -> Self {
+        match axis {
+            Axis3::X => Self::unit_x(),
+            Axis3::Y => Self::unit_y(),
+            Axis3::Z => Self::unit_z(),
+        }
+    }
 }
 
 impl<T> Vector3<T>
