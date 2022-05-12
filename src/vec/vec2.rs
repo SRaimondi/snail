@@ -240,6 +240,15 @@ where
     pub fn unit_y() -> Self {
         Self::new(T::ZERO, T::ONE)
     }
+
+    /// Return the unit axis for the given axis.
+    #[inline(always)]
+    pub fn unit_for_axis(axis: Axis2) -> Self {
+        match axis {
+            Axis2::X => Self::unit_x(),
+            Axis2::Y => Self::unit_y(),
+        }
+    }
 }
 
 impl<T> Vector2<T>
