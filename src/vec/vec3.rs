@@ -154,6 +154,18 @@ where
         Vec3bool::new(self.x >= other.x, self.y >= other.y, self.z >= other.z)
     }
 
+    /// Check if the elements are equal to the one of the other.
+    #[inline(always)]
+    pub fn ewise_eq(self, other: Self) -> Vec3bool {
+        Vec3bool::new(self.x == other.x, self.y == other.y, self.z == other.z)
+    }
+
+    /// Check if the elements are different to the one of the other.
+    #[inline(always)]
+    pub fn ewise_neq(self, other: Self) -> Vec3bool {
+        Vec3bool::new(self.x != other.x, self.y != other.y, self.z != other.z)
+    }
+
     /// Find largest axis.
     #[inline(always)]
     pub fn largest_axis(self) -> Axis3 {

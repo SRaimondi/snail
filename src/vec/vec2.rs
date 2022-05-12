@@ -147,6 +147,18 @@ where
         Vec2bool::new(self.x >= other.x, self.y >= other.y)
     }
 
+    /// Check if the elements are equal to the one of the other.
+    #[inline(always)]
+    pub fn ewise_eq(self, other: Self) -> Vec2bool {
+        Vec2bool::new(self.x == other.x, self.y == other.y)
+    }
+
+    /// Check if the elements are different to the one of the other.
+    #[inline(always)]
+    pub fn ewise_neq(self, other: Self) -> Vec2bool {
+        Vec2bool::new(self.x != other.x, self.y != other.y)
+    }
+
     /// Find largest axis.
     #[inline(always)]
     pub fn largest_axis(self) -> Axis2 {
