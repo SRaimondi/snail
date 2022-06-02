@@ -240,6 +240,21 @@ where
 
 impl<T> Vector3<T>
 where
+    T: Copy + Add<Output = T> + Mul<Output = T> + Neg<Output = T> + Zero + PartialOrd,
+{
+    /// Orient self such that the dot product of the two vectors is >= 0.0
+    #[inline(always)]
+    pub fn orient_with(self, other: Self) -> Self {
+        if self.dot(other) >= T::ZERO {
+            self
+        } else {
+            -self
+        }
+    }
+}
+
+impl<T> Vector3<T>
+where
     T: Zero,
 {
     /// Return a vector with all components zero.
