@@ -8,8 +8,8 @@ use std::{
 /// Enum used to represent the axes for Vec2.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Axis2 {
-    X,
-    Y,
+    X = 0,
+    Y = 1,
 }
 
 impl Axis2 {

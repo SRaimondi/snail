@@ -8,9 +8,9 @@ use std::{
 /// Enum used to represent the axes for Vec3.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Axis3 {
-    X,
-    Y,
-    Z,
+    X = 0,
+    Y = 1,
+    Z = 2,
 }
 
 impl Axis3 {
