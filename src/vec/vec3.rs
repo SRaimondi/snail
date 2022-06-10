@@ -23,6 +23,16 @@ impl Axis3 {
             Self::Z => Self::X,
         }
     }
+
+    /// Return the other two axes.
+    #[inline(always)]
+    pub const fn others(self) -> (Self, Self) {
+        match self {
+            Self::X => (Self::Y, Self::Z),
+            Self::Y => (Self::X, Self::Z),
+            Self::Z => (Self::X, Self::Y),
+        }
+    }
 }
 
 /// Helper class representing boolean operations on vector

@@ -21,6 +21,12 @@ impl Axis2 {
             Self::Y => Self::X,
         }
     }
+
+    /// Return the other axis.
+    #[inline(always)]
+    pub const fn other(self) -> Self {
+        self.next()
+    }
 }
 
 /// Helper class representing boolean operations on vector
