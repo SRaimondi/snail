@@ -48,7 +48,7 @@ macro_rules! generate_quaternion {
             }
 
             /// Create quaternion as rotation between two vectors.
-            /// Vector are expected to be normalised.
+            /// Panics in debug if the norm of either vector is not close enough to 1.0.
             #[inline(always)]
             pub fn from_two_vectors_normalised(from: $vec_name, to: $vec_name) -> Self {
                 debug_assert!(from.norm().approx_eq(1.0));
@@ -67,21 +67,29 @@ macro_rules! generate_quaternion {
             }
 
             /// Create quaternion as rotation between two vectors.
-            /// Vector are not expected to be normalised.
             #[inline(always)]
             pub fn from_two_vectors(from: $vec_name, to: $vec_name) -> Self {
                 Self::from_two_vectors_normalised(from.normalised(), to.normalised())
             }
 
-            /// Create rotation versor. Assumes axis has unit length.
+            /// Create rotation versor from the given angle and axis.
+            /// Panics in debug if the norm of the axis is not 1.0.
             #[inline(always)]
-            pub fn from_rotation(angle: $t, axis: $vec_name) -> Self {
+            pub fn from_rotation_normalised(angle: $t, axis: $vec_name) -> Self {
                 debug_assert!(axis.norm().approx_eq(1.0));
                 let (s, c) = (angle / 2.0).sin_cos();
                 Self::new(c, s * axis)
             }
 
+            /// Create rotation versor for the given angle and axis.
+            #[inline(always)]
+            pub fn from_rotation(angle: $t, axis: $vec_name) -> Self {
+                Self::from_rotation_normalised(angle, axis.normalised())
+            }
+
             /// Create quaternion from given rotation matrix columns.
+            /// Panics in debug if the length of the given columns is not one or they are
+            /// not perpendicular.
             #[inline]
             pub fn from_frame(s: $vec_name, n: $vec_name, t: $vec_name) -> Self {
                 debug_assert!(s.norm().approx_eq(1.0));
@@ -181,6 +189,8 @@ macro_rules! generate_quaternion {
             }
 
             /// Extract angle of the quaternion.
+            /// Assumes the quaternion has been normalised so the scalar part should be at most 1.0,
+            /// panics in debug if that's not the case.
             #[inline(always)]
             pub fn angle(self) -> $t {
                 // If quaternion is normalised, this should not happen
