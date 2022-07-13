@@ -692,3 +692,10 @@ impl<T> From<Vector3<T>> for (T, T, T) {
         (v.x, v.y, v.z)
     }
 }
+
+impl<T> From<Vector3<T>> for [T; 3] {
+    #[inline(always)]
+    fn from(v: Vector3<T>) -> Self {
+        [v.x, v.y, v.z]
+    }
+}

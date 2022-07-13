@@ -6,7 +6,7 @@ use std::{
 };
 
 /// Enum used to represent the axes for Vec2.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum Axis2 {
     X = 0,
     Y = 1,
@@ -611,5 +611,12 @@ impl<T> From<Vector2<T>> for (T, T) {
     #[inline(always)]
     fn from(v: Vector2<T>) -> Self {
         (v.x, v.y)
+    }
+}
+
+impl<T> From<Vector2<T>> for [T; 2] {
+    #[inline(always)]
+    fn from(v: Vector2<T>) -> Self {
+        [v.x, v.y]
     }
 }

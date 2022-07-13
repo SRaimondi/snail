@@ -1,4 +1,5 @@
 use crate::{ApproxEq, Vec3f32, Vec3f64};
+
 use std::{
     f32, f64,
     ops::{Add, Div, Mul, Neg, Sub},
